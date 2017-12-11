@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.innovation.neha.tracklocation.FusedActivity">
+
+    <Button
+        android:id = "@+id/btn_track"
+        android:layout_width = "fill_parent"
+        android:layout_height = "wrap_content"
+        android:text = "getlocation"
+        />
+
+    <TextView
+        android:hint="Lattitude"
+        android:id="@+id/tv_lat"
+        android:layout_margin="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:text="Longitude"
+        android:id="@+id/tv_lng"
+        android:layout_margin="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+    <TextView
+        android:text="Time"
+        android:id="@+id/tv_timeg"
+        android:layout_margin="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

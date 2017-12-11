@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#009688">
+    tools:context="com.innovation.neha.tracklocation.PlaceOrderActivity"><!--009688-->
+
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="700dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#ffffff"
+                android:orientation="vertical"
+                android:weightSum="34.9"><!--80cbc4-->
+
+                <LinearLayout
+                    android:id="@+id/ll_clnt_detl"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="5.5"
+                    android:orientation="vertical"
+                    android:weightSum="2.4">
+
+
+                    <EditText
+                        android:id="@+id/et_ord_no"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1.2"
+                        android:hint="Order No"
+                        android:textColorHint="#424242" />
+
+
+                    <EditText
+                        android:id="@+id/et_clnt_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_margin="2dp"
+                        android:layout_weight="1.2"
+                        android:hint="Client Name"
+                        android:textColorHint="#424242" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_ord_dtl"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="11.5"
+                    android:orientation="vertical"
+                    android:weightSum="9.6">
+
+
+                    <fr.ganfra.materialspinner.MaterialSpinner
+                        android:id="@+id/sp_prod"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="4dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="2.3"
+                        app:ms_alignLabels="false"
+                        app:ms_arrowColor="#000000"
+                        app:ms_arrowSize="16dp"
+                        app:ms_baseColor="#666666"
+                        app:ms_enableErrorLabel="false"
+                        app:ms_enableFloatingLabel="false"
+                        app:ms_errorColor="#453456"
+                        app:ms_floatingLabelColor="#000000"
+                        app:ms_floatingLabelText="Product"
+                        app:ms_highlightColor="#000000"
+                        app:ms_hint="Product"
+                        app:ms_hintColor="#000000"
+                        app:ms_multiline="false"
+                        app:ms_thickness="0.5dp" />
+                    <!--Spinner
+                    android:id="@+id/sp_prod"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="4dp"
+                    android:layout_weight="1.2"
+                  android:background="#FFE0B2"
+                    android:tooltipText="Product"
+                    />FFCCBC-->
+
+
+                    <fr.ganfra.materialspinner.MaterialSpinner
+                        android:id="@+id/sp_weight"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="4dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="2.3"
+
+                        app:ms_alignLabels="false"
+                        app:ms_arrowColor="#000000"
+                        app:ms_arrowSize="16dp"
+                        app:ms_baseColor="#666666"
+                        app:ms_enableErrorLabel="false"
+                        app:ms_enableFloatingLabel="false"
+                        app:ms_errorColor="#453456"
+                        app:ms_floatingLabelColor="#000000"
+                        app:ms_floatingLabelText="Product"
+                        app:ms_highlightColor="#000000"
+                        app:ms_hint="Weight"
+                        app:ms_hintColor="#000000"
+                        app:ms_multiline="false"
+                        app:ms_thickness="0.5dp" />
+                    <!--Spinner
+                    android:id="@+id/sp_weight"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="4dp"
+                    android:layout_weight="1.2"
+                    android:background="#FFE0B2"
+                    android:tooltipText="Weight" /-->
+
+                    <EditText
+                        android:id="@+id/et_qty"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_margin="1.5dp"
+                        android:layout_weight="2.5"
+                        android:hint="Quantity"
+                        android:textColorHint="#424242" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="2dp"
+                        android:layout_weight="2.5"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:weightSum="5">
+
+                        <TextView
+                            android:id="@+id/tv_price"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="4dp"
+                            android:layout_marginStart="4dp"
+                            android:layout_weight="2"
+                            android:background="#FFAB91"
+                            android:gravity="center_vertical"
+                            android:text="Price : 45.00"
+                            android:textAlignment="center"
+                            android:textColor="#424242"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <Space
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.2" />
+
+
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/fab_plus"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:src="@drawable/ic_add"
+                            app:backgroundTint="#FFA726"
+                            app:fabSize="mini" />
+
+                        <Space
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.2" />
+
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/fab_minus"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:src="@drawable/ic_minus"
+                            app:backgroundTint="#9C27B0"
+                            app:fabSize="mini" />
+
+                        <Space
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.2" />
+
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.50"
+                            android:background="@drawable/ic_bag7"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_bag"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginEnd="2dp"
+                                android:layout_marginRight="2dp"
+                                android:layout_marginTop="16dp"
+                                android:padding="4dp"
+                                android:text="5"
+                                android:textColor="#FFFFFF"
+                                android:textSize="20sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/tv_payment_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="2.3"
+                    android:background="#80cbc4"
+                    android:gravity="center_vertical"
+                    android:text="Total Amt: 90.67"
+                    android:textAlignment="center"
+                    android:textColor="#424242"
+                    android:textSize="19sp"
+                    android:textStyle="bold" />
+
+                <!--RadioGroup
+        android:id="@+id/rg_payment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"-->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginStart="4dp"
+android:layout_marginTop="4dp"
+                    android:layout_margin="4dp"
+                    android:layout_weight="8.7"
+                    android:background="#42A5F5"
+                    android:orientation="vertical"
+                    android:weightSum="8.4">
+
+                    <TextView
+                        android:id="@+id/tv_tot_amt"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_margin="2dp"
+                        android:layout_weight="1.4"
+                        android:text="Select Payment Method:"
+                        android:gravity="center_vertical"
+                        android:textColor="#424242"
+                        android:textSize="17sp" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_radio_parent"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginEnd="2dp"
+                        android:layout_marginLeft="2dp"
+                        android:layout_marginRight="2dp"
+                        android:layout_marginStart="2dp"
+
+                        android:layout_weight="6.8"
+                        android:background="#BBDEFB"
+                        android:orientation="horizontal"
+                        android:weightSum="3">
+
+                        <LinearLayout
+                            android:id="@+id/ll_cash"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="#BBDEFB"
+                            android:orientation="vertical">
+
+                            <RadioButton
+                                android:id="@+id/rb_cash"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Cash" />
+
+
+                            <EditText
+                                android:id="@+id/et_cash_rcvd_amt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:enabled="false"
+                                android:hint="Rcvd Amt" />
+
+                            <EditText
+                                android:id="@+id/et_cash_rcvd"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:enabled="false"
+                                android:hint="Rcvd Amt"
+                                android:visibility="invisible" />
+
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ll_cheque"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="#BBDEFB"
+                            android:orientation="vertical">
+
+
+                            <RadioButton
+                                android:id="@+id/rb_chq"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Cheque" />
+
+
+                            <EditText
+                                android:id="@+id/et_chq_no"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:enabled="false"
+                                android:hint="Cheque no." />
+
+                            <EditText
+                                android:id="@+id/et_chq_rcvd_amt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:enabled="false"
+                                android:hint="Rcvd Amt" />
+
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/ll_dd"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+
+                            android:layout_weight="1"
+                            android:background="#BBDEFB"
+                            android:orientation="vertical">
+
+                            <RadioButton
+                                android:id="@+id/rb_dd"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="DD" />
+
+
+                            <EditText
+                                android:id="@+id/et_dd_no"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:enabled="false"
+                                android:hint="DD no." />
+
+                            <EditText
+                                android:id="@+id/et_dd_rcvd_amt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:enabled="false"
+                                android:hint="Rcvd Amt" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!--/RadioGroup-->
+
+                <Button
+                    android:id="@+id/btn_submit"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="25dp"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="25dp"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_weight="1.9"
+                    android:background="#FFAB91"
+                    android:textColor="#000000"
+                    android:textStyle="bold"
+                    android:text="Submit" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <EditText
+                    android:id="@+id/et_ord"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="Order No"
+                    android:paddingEnd="250dp"
+                    android:paddingRight="300dp"
+                    android:textColorHint="#424242"
+                    android:visibility="invisible" />
+
+                <ImageView
+                    android:id="@+id/img_overplus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_chili" />
+            </LinearLayout>
+
+        </FrameLayout>
+
+
+</LinearLayout>
+</ScrollView>
