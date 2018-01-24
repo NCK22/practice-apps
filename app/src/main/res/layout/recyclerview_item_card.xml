@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:layout_marginStart="10dp"
+    android:layout_marginRight="10dp"
+    android:layout_marginEnd="10dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginBottom="5dp"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#ffffff"
+   >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:weightSum="10"
+        android:orientation="horizontal"
+        android:layout_marginTop="2dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginBottom="2dp"
+        android:background="@drawable/border">
+
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_weight="6"
+    android:orientation="vertical"
+    android:weightSum="5"
+    android:layout_margin="2dp"
+    android:layout_marginBottom="5dp"
+    android:background="#ffffff"
+    >
+    <TextView
+        android:id="@+id/tv_h_ord"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.5"
+        android:text="Ord No. A349"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textSize="12sp"
+        android:layout_margin="2dp"
+        android:textColor="#ffffff"
+        android:background="#0288D1"
+        />
+
+    <TextView
+        android:id="@+id/tv_h_name"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.5"
+        android:text="Ram bandhu masale"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textSize="12sp"
+        android:layout_margin="2dp"
+        android:textColor="#000000"
+        />
+
+        <TextView
+            android:id="@+id/tv_h_tot"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:text="Tot Amt: 290.00"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="15sp"
+            android:layout_margin="2dp"
+            android:textColor="#000000"
+          />
+
+</LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="4"
+            android:weightSum="2">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:layout_weight="1.1"
+            android:weightSum="2"
+            android:layout_marginStart="2dp"
+            android:layout_marginLeft="2dp"
+          >
+
+
+
+    <ImageButton
+        android:id="@+id/btn_edit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_gravity="center"
+        android:padding="3dp"
+        android:textStyle="bold"
+        android:background="#00000000"
+        android:text="Edit"
+        android:clickable="true"
+        android:src="@drawable/ic_edit2"/><!--81c784-->
+
+    <ImageButton
+        android:id="@+id/btn_del"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="3dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginRight="2dp"
+        android:padding="3dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_delete1"
+        android:clickable="true"
+        android:background="#00000000"/><!--F44336-->
+        </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_h_det"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.7"
+                android:text="Details"
+                android:textColor="#000000"
+                android:background="#c5c5c5"
+                android:textStyle="bold"
+                android:textSize="10sp"
+                android:gravity="center"
+                android:clickable="true"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

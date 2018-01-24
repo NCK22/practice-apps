@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.innovation.neha.tracklocation.Activities.NewVisitActivity"
+    android:background="@drawable/histborder">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="20dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Id :"
+                    android:textSize="25sp"
+                    android:padding="5sp"
+                    android:layout_marginTop="20dp"
+                    android:layout_weight="1"/>
+                <TextView
+                    android:id="@+id/text_visit_id"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:hint="0000000"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:padding="5sp"
+                    android:layout_marginTop="20dp"
+                    android:layout_weight="2"/>
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/et_vName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border"
+                android:hint="Name"
+                android:textSize="25sp"
+                android:padding="5sp"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:layout_marginBottom="10dp"/>
+
+            <!--EditText
+                android:id="@+id/et_loc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border"
+                android:layout_marginBottom="10dp"
+                android:textSize="25sp"
+                android:padding="5sp"
+                android:hint="Location"
+
+                /-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border">
+
+            <fragment
+                android:id="@+id/place_autocomplete_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="0dp"
+                android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+                />
+        </LinearLayout>
+
+            <EditText
+                android:id="@+id/et_loc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5sp"
+                android:textSize="25sp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/border"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Date and Time :"
+                android:textSize="25sp"
+                android:padding="5sp"
+                android:layout_weight="1"/>
+
+
+            <LinearLayout
+                android:id="@+id/date_time_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/border">
+
+                <TextView
+                    android:id="@+id/text_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="DD/MM/YYYY"
+                    android:textSize="25sp"
+                    android:padding="5sp"
+                    android:gravity="center"/>
+                <TextView
+                    android:id="@+id/text_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="00:00 AM"
+                    android:textSize="25sp"
+                    android:padding="5sp"
+                    android:gravity="center"/>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_vsubmit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/border"
+                android:text="Start"
+                android:textSize="25sp"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="35dp"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

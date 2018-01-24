@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="3dp"
+    android:weightSum="3"
+   android:background="#00000000"
+    tools:context="com.innovation.neha.tracklocation.Activities.DialogActivity">
+    <!-- android:background="#00E5FF"-->
+
+    <!-- android:background="#00E5FF"-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:weightSum="8"
+        android:background="#e6e6e6"
+        android:padding="30dp"
+        android:layout_gravity="center"
+        android:visibility="invisible"
+        >
+
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:weightSum="8"
+        android:background="#e6e6e6"
+        android:padding="30dp"
+        android:layout_gravity="center"
+        >
+
+    <TextView
+        android:id="@+id/tv_del_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:textSize="17sp"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:paddingBottom="5dp"
+        android:textStyle="bold"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+    <Button
+        android:id="@+id/btn_del_dialog_yes"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:textStyle="bold"
+        android:layout_margin="6dp"
+        android:textSize="15sp"
+        android:text="Yes"
+    android:textColor="#ffffff"
+        android:background="#111111"/>
+
+        <Button
+            android:id="@+id/btn_del_dialog_no"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:textStyle="bold"
+            android:layout_margin="6dp"
+            android:textSize="15sp"
+            android:text="No"
+            android:textColor="#ffffff"
+            android:background="#111111"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:weightSum="8"
+        android:background="#e6e6e6"
+        android:padding="30dp"
+        android:layout_gravity="center"
+        android:visibility="invisible"
+        >
+
+
+
+    </LinearLayout>
+
+
+</LinearLayout>
