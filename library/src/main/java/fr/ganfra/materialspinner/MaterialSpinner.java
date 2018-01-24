@@ -234,6 +234,7 @@ public class MaterialSpinner extends AppCompatSpinner implements ValueAnimator.A
         }
     }
 
+
     @Override
     public int getSelectedItemPosition() {
         return super.getSelectedItemPosition();

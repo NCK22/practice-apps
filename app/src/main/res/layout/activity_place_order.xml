@@ -6,26 +6,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="false">
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#009688">
-    tools:context="com.innovation.neha.tracklocation.PlaceOrderActivity"><!--009688-->
+    tools:context="com.innovation.neha.tracklocation.Activities.PlaceOrderActivity"><!--009688-->
 
 
 
-        <FrameLayout
+       <!-- <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="700dp">
+            android:layout_height="1000dp"
+            android:background="#000000">-->
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="910dp"
                 android:background="#ffffff"
                 android:orientation="vertical"
-                android:weightSum="34.9"><!--80cbc4-->
+                android:weightSum="37.5"><!--80cbc4-->
 
                 <LinearLayout
                     android:id="@+id/ll_clnt_detl"
@@ -33,25 +34,32 @@
                     android:layout_height="0dp"
                     android:layout_weight="5.5"
                     android:orientation="vertical"
-                    android:weightSum="2.4">
+                    android:weightSum="2.4"
+                    >
 
 
-                    <EditText
-                        android:id="@+id/et_ord_no"
+                    <TextView
+                        android:id="@+id/tv_ord_no"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1.2"
-                        android:hint="Order No"
+                        android:textStyle="bold"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp"
+                        android:background="#9C27B0"
+                        android:gravity="center"
                         android:textColorHint="#424242" />
 
 
-                    <EditText
+                    <AutoCompleteTextView
                         android:id="@+id/et_clnt_name"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_margin="2dp"
                         android:layout_weight="1.2"
                         android:hint="Client Name"
+                        android:maxLines="1"
+                        android:singleLine="true"
                         android:textColorHint="#424242" />
 
                 </LinearLayout>
@@ -60,9 +68,30 @@
                     android:id="@+id/ll_ord_dtl"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="11.5"
+                    android:layout_weight="10"
                     android:orientation="vertical"
                     android:weightSum="9.6">
+
+
+
+                    <!--gr.escsoft.michaelprimez.searchablespinner.SearchableSpinner
+                        android:id="@+id/sp_prod"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginLeft="24dp"
+                        android:layout_marginRight="24dp"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginEnd="24dp"
+                        android:gravity="center_horizontal"
+                        app:StartSearchTintColor="@android:color/white"
+                        app:DoneSearchTintColor="@android:color/holo_purple"
+                        app:RevealViewBackgroundColor="@android:color/holo_purple"
+                        app:SearchViewBackgroundColor="@android:color/secondary_text_dark"
+                        app:ShowBorders="false"
+                        app:RevealEmptyText="Touch to select"
+                        app:SpinnerExpandHeight="300dp"/-->
+
 
 
                     <fr.ganfra.materialspinner.MaterialSpinner
@@ -87,7 +116,8 @@
                         app:ms_hint="Product"
                         app:ms_hintColor="#000000"
                         app:ms_multiline="false"
-                        app:ms_thickness="0.5dp" />
+                        app:ms_thickness="0.5dp"
+                        />
                     <!--Spinner
                     android:id="@+id/sp_prod"
                     android:layout_width="match_parent"
@@ -119,7 +149,7 @@
                         app:ms_floatingLabelColor="#000000"
                         app:ms_floatingLabelText="Product"
                         app:ms_highlightColor="#000000"
-                        app:ms_hint="Weight"
+                        app:ms_hint="Weight in gms"
                         app:ms_hintColor="#000000"
                         app:ms_multiline="false"
                         app:ms_thickness="0.5dp" />
@@ -139,7 +169,10 @@
                         android:layout_margin="1.5dp"
                         android:layout_weight="2.5"
                         android:hint="Quantity"
-                        android:textColorHint="#424242" />
+                        android:singleLine="true"
+                        android:maxLines="1"
+                        android:textColorHint="#424242"
+                        android:inputType="number"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -162,7 +195,7 @@
                             android:layout_weight="2"
                             android:background="#FFAB91"
                             android:gravity="center_vertical"
-                            android:text="Price : 45.00"
+                            android:text="Price : 0.0"
                             android:textAlignment="center"
                             android:textColor="#424242"
                             android:textSize="18sp"
@@ -194,7 +227,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:src="@drawable/ic_minus"
-                            app:backgroundTint="#9C27B0"
+                            app:backgroundTint="#FFA726"
                             app:fabSize="mini" />
 
                         <Space
@@ -221,7 +254,7 @@
                                 android:layout_marginRight="2dp"
                                 android:layout_marginTop="16dp"
                                 android:padding="4dp"
-                                android:text="5"
+                                android:text="0"
                                 android:textColor="#FFFFFF"
                                 android:textSize="20sp"
                                 android:textStyle="bold" />
@@ -232,7 +265,7 @@
 
 
                 <TextView
-                    android:id="@+id/tv_payment_title"
+                    android:id="@+id/tv_tot_amt"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_gravity="center_horizontal"
@@ -241,14 +274,45 @@
                     android:layout_marginRight="4dp"
                     android:layout_marginStart="4dp"
                     android:layout_marginTop="5dp"
-                    android:layout_weight="2.3"
+                    android:layout_weight="1.7"
                     android:background="#80cbc4"
                     android:gravity="center_vertical"
-                    android:text="Total Amt: 90.67"
+                    android:text="Total Amt: 0.0"
+
                     android:textAlignment="center"
                     android:textColor="#424242"
                     android:textSize="19sp"
                     android:textStyle="bold" />
+                <!--2.3-->
+
+                <!--1.9-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1.6"
+                    android:background="@drawable/doneborder"
+                    android:weightSum="1"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/btn_done"
+                        style="@style/Widget.AppCompat.Button.Colored"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="75dp"
+                        android:layout_marginLeft="75dp"
+                        android:layout_marginRight="75dp"
+                        android:layout_marginStart="75dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="3dp"
+                        android:layout_weight="1"
+                        android:background="#9C27B0"
+                        android:textColor="#ffffff"
+                        android:textStyle="bold"
+                        android:text="Done" />
+                </LinearLayout>
+
 
                 <!--RadioGroup
         android:id="@+id/rg_payment"
@@ -256,6 +320,7 @@
         android:layout_height="0dp"
         android:layout_weight="3"-->
 
+                <!--9.5-->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -263,15 +328,16 @@
                     android:layout_marginLeft="4dp"
                     android:layout_marginRight="4dp"
                     android:layout_marginStart="4dp"
-android:layout_marginTop="4dp"
+                    android:layout_marginTop="4dp"
                     android:layout_margin="4dp"
                     android:layout_weight="8.7"
                     android:background="#42A5F5"
                     android:orientation="vertical"
-                    android:weightSum="8.4">
+                    android:weightSum="9.5"
+                    >
 
                     <TextView
-                        android:id="@+id/tv_tot_amt"
+                        android:id="@+id/tv_payment_title"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_margin="2dp"
@@ -280,6 +346,20 @@ android:layout_marginTop="4dp"
                         android:gravity="center_vertical"
                         android:textColor="#424242"
                         android:textSize="17sp" />
+                    <TextView
+                        android:id="@+id/tv_rest_amt"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1.5"
+                        android:text="Amt to be paid: "
+                        android:gravity="center_vertical"
+                        android:textColor="#424242"
+                        android:background="#FFF176"
+                        android:textSize="17sp"
+                        android:layout_marginLeft="2dp"
+                        android:layout_marginRight="2dp"
+                        android:layout_marginEnd="2dp"
+                        android:layout_marginStart="2dp"/>
 
                     <LinearLayout
                         android:id="@+id/ll_radio_parent"
@@ -290,7 +370,7 @@ android:layout_marginTop="4dp"
                         android:layout_marginRight="2dp"
                         android:layout_marginStart="2dp"
 
-                        android:layout_weight="6.8"
+                        android:layout_weight="6.5"
                         android:background="#BBDEFB"
                         android:orientation="horizontal"
                         android:weightSum="3">
@@ -315,6 +395,9 @@ android:layout_marginTop="4dp"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:enabled="false"
+                                android:singleLine="true"
+                                android:maxLines="1"
+                                android:inputType="numberDecimal"
                                 android:hint="Rcvd Amt" />
 
                             <EditText
@@ -349,6 +432,8 @@ android:layout_marginTop="4dp"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:enabled="false"
+                                android:inputType="number"
+                                android:maxLength="6"
                                 android:hint="Cheque no." />
 
                             <EditText
@@ -356,10 +441,12 @@ android:layout_marginTop="4dp"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:enabled="false"
+                                android:singleLine="true"
+                                android:maxLines="1"
+                                android:inputType="numberDecimal"
                                 android:hint="Rcvd Amt" />
 
                         </LinearLayout>
-
 
                         <LinearLayout
                             android:id="@+id/ll_dd"
@@ -382,13 +469,18 @@ android:layout_marginTop="4dp"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:enabled="false"
-                                android:hint="DD no." />
+                                android:hint="DD no."
+                                android:inputType="number"
+                                android:maxLength="6"/>
 
                             <EditText
                                 android:id="@+id/et_dd_rcvd_amt"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:enabled="false"
+                                android:singleLine="true"
+                                android:maxLines="1"
+                                android:inputType="numberDecimal"
                                 android:hint="Rcvd Amt" />
 
                         </LinearLayout>
@@ -398,7 +490,7 @@ android:layout_marginTop="4dp"
 
                 <!--/RadioGroup-->
 
-                <Button
+                <!--Button
                     android:id="@+id/btn_submit"
                     style="@style/Widget.AppCompat.Button.Colored"
                     android:layout_width="match_parent"
@@ -413,12 +505,57 @@ android:layout_marginTop="4dp"
                     android:background="#FFAB91"
                     android:textColor="#000000"
                     android:textStyle="bold"
-                    android:text="Submit" />
+                    android:text="Submit" /-->
+                <LinearLayout
+                    android:id="@+id/ll_image"
+                    android:layout_width="match_parent"
+                   android:layout_height="0dp"
+                    android:layout_weight="10"
+                    android:orientation="vertical"
+                    android:background="#344554"
+                    android:layout_marginTop="5dp"
+                    >
+                    <!-- android:layout_height="250dp"-->
+
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_height="150dp"
+                    android:id="@+id/imageView"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+
+                <Button
+                    android:text="Click here to capture image using camera"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btn_Capture"
+                    android:layout_below="@+id/imageView"/>
 
 
+                </LinearLayout>
+
+
+                <Button
+                    android:id="@+id/btn_upload"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="SUBMIT"
+                    android:background="#FFAB91"
+                    android:textColor="#000000"
+                    android:textSize="17sp"
+                    android:layout_below="@+id/editText"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="7dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
             </LinearLayout>
 
-            <LinearLayout
+           <!-- <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -437,11 +574,14 @@ android:layout_marginTop="4dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:src="@drawable/ic_chili" />
+                    android:src="@drawable/ic_chili"
+                    android:visibility="invisible"/>
             </LinearLayout>
 
-        </FrameLayout>
+        </FrameLayout>-->
 
 
 </LinearLayout>
+
+
 </ScrollView>

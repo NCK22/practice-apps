@@ -1,4 +1,4 @@
-package com.innovation.neha.tracklocation;
+package com.innovation.neha.tracklocation.Activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.innovation.neha.tracklocation.R;
 import com.innovation.neha.tracklocation.Services.TrackLocService;
 
 
@@ -43,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
 
 
                 Log.e("Location ","changed");
-                Toast.makeText(MainActivity.this, "Latitude"+String.valueOf(location.getLatitude()), Toast.LENGTH_SHORT).show();
-                Toast.makeText(MainActivity.this, "Longitude " +location.getLongitude(), Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(MainActivity.this, "Latitude"+String.valueOf(location.getLatitude()), Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(MainActivity.this, "Longitude " +location.getLongitude(), Toast.LENGTH_SHORT).show();
                 Log.e("lattitude ",String.valueOf(location.getLatitude())+" Longitude"+String.valueOf(location.getLongitude()));
             }
 

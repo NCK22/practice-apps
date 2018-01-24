@@ -1,9 +1,8 @@
-package com.innovation.neha.tracklocation;
+package com.innovation.neha.tracklocation.Activities;
 
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -18,8 +17,6 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -33,8 +30,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
-
-import org.json.JSONObject;
+import com.innovation.neha.tracklocation.AppController;
+import com.innovation.neha.tracklocation.R;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -65,7 +62,7 @@ public class FusedActivity extends AppCompatActivity implements
     // Tag used to cancel the request
     String tag_string_req = "string_req";
 
-    String url = "http://192.168.1.203/location_track/SendLocation.php";
+    String url = "http://192.168.1.203/Rajeshahi_Masale/SendLocation.php";
 
 
 
@@ -129,8 +126,8 @@ public class FusedActivity extends AppCompatActivity implements
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
 
-                                Toast.makeText(FusedActivity.this, "Longitude:" + location.getLongitude(), Toast.LENGTH_SHORT).show();
-                                Toast.makeText(FusedActivity.this, "Lattitude:" + location.getLatitude(), Toast.LENGTH_SHORT).show();
+                               // Toast.makeText(FusedActivity.this, "Longitude:" + location.getLongitude(), Toast.LENGTH_SHORT).show();
+                              //  Toast.makeText(FusedActivity.this, "Lattitude:" + location.getLatitude(), Toast.LENGTH_SHORT).show();
                                 // Logic to handle location object
                             }
                         }

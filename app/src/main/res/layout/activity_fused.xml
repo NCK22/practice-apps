@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.innovation.neha.tracklocation.FusedActivity">
+    tools:context="com.innovation.neha.tracklocation.Activities.FusedActivity">
 
     <Button
         android:id = "@+id/btn_track"

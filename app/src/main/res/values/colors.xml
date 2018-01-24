@@ -4,4 +4,10 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="spinnerColor">#FFE0B2</color>
+
+    <color name="firstlayer">#40C4FF</color>
+    <color name="secondlayer">#18FFFF</color>
+    <color name="thirdlayer">#1DE9B6</color>
+    <color name="border">#ffdd33</color>
+    <color name="transparent">#00000000</color>
 </resources>

@@ -5,14 +5,37 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.innovation.neha.tracklocation.SplashActivity">
+    android:background="@drawable/ic_spice3"
+    tools:context="com.innovation.neha.tracklocation.Activities.SplashActivity">
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="3"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="350dp">
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"/>
     <Button
         android:id = "@+id/btn_track"
-        android:layout_width = "fill_parent"
-        android:layout_height = "wrap_content"
-        android:text = "getlocation"
-        android:background="@drawable/ic_launcher_foreground"
+        android:layout_width = "0dp"
+        android:layout_weight="2.1"
+        android:layout_height = "200dp"
+
+        android:textStyle="bold"
+
+        android:layout_marginTop="0dp"
+        android:layout_gravity="center"
+        android:background="@mipmap/ic_launcher_foreground"
         />
+        <android.support.v4.widget.Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"/>
+    </LinearLayout>
 
 </LinearLayout>

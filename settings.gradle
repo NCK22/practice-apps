@@ -1,1 +1,1 @@
-include ':app', ':sample', ':library'
+include ':app', ':sample', ':library', ':compressor' //':library-material' ':searchablespinner',

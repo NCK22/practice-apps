@@ -1,17 +1,23 @@
-package com.innovation.neha.tracklocation;
+package com.innovation.neha.tracklocation.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.innovation.neha.tracklocation.R;
 import com.innovation.neha.tracklocation.Services.TrackLocService;
+import com.innovation.neha.tracklocation.Storage.SPrefUserInfo;
 
 /**
  * Created by Neha on 24-11-2017.
  */
 
 public class SplashActivity extends AppCompatActivity {
+
+    Intent intent;
+    public static SPrefUserInfo sPrefUserInfo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -20,6 +26,8 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         Log.e("Splashscreen","created");
+        sPrefUserInfo = new SPrefUserInfo(this);
+
         Thread splash= new Thread(){
             public void run(){
                 try{
@@ -27,7 +35,11 @@ public class SplashActivity extends AppCompatActivity {
                     sleep(3000);
                     Intent Servintent=new Intent(SplashActivity.this, TrackLocService.class);
                    // startService(Servintent);
-                    Intent intent = new Intent(SplashActivity.this, PlaceOrderActivity.class);
+                    if(sPrefUserInfo.getUserInfo().equals(""))
+                        intent= new Intent(SplashActivity.this, LoginActivity.class);
+                    else
+                    intent = new Intent(SplashActivity.this, FrontActivity.class);
+
                     startActivity(intent);
 
                 } catch (InterruptedException e) {

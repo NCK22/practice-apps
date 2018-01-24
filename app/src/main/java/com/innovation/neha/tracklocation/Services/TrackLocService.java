@@ -7,7 +7,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.icu.text.UnicodeSetSpanner;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -15,19 +14,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -39,10 +35,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.innovation.neha.tracklocation.Activities.NewVisitActivity;
 import com.innovation.neha.tracklocation.AppController;
-import com.innovation.neha.tracklocation.FusedActivity;
-import com.innovation.neha.tracklocation.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,7 +46,6 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executor;
 
 /**
  * Created by Neha on 27-11-2017.
@@ -69,6 +62,7 @@ public class TrackLocService extends Service implements
     private static final String TAG = "LocationActivity";
     private static final long INTERVAL = 1000 * 5;
     private static final long FASTEST_INTERVAL = 1000 * 2;
+    public static  boolean permissionresult=false;
     LocationRequest mLocationRequest;
     Location mCurrentLocation;
     String mLastUpdateTime;
@@ -83,8 +77,11 @@ public class TrackLocService extends Service implements
     // Tag used to cancel the request
     String tag_string_req = "string_req";
 
-    String url = "http://192.168.1.203/location_track/SendLocation.php?p_id=32";
-    Context context;
+    String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/SendLocation.php";
+    public static String vid="";
+    Context context,ctxperm;
+    public static TrackLocService instance=null;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -103,6 +100,7 @@ public class TrackLocService extends Service implements
     public void onCreate() {
         super.onCreate();
 
+        instance=this;
         context=this;
         if (!isGooglePlayServicesAvailable()) {
             //finish();
@@ -160,9 +158,15 @@ public class TrackLocService extends Service implements
     }
 
     @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         stopSelf();
+        instance=null;
         Log.e("Service","Destroyed");
     }
     /*@Override
@@ -207,8 +211,12 @@ public class TrackLocService extends Service implements
     }
 
     private void startLocationUpdates() {
+
+        Log.e("inside","startlocationupdate");
        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-             return;
+           Log.e("permission","not granted");
+           permissionresult=false;
+              return;
         }
         PendingResult<Status> pendingResult = LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, mLocationRequest, this);
@@ -235,10 +243,14 @@ public class TrackLocService extends Service implements
         Log.e(TAG, "Firing onLocationChanged..............................................");
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-        sendLocationString();
+        Log.e("isRunning", String.valueOf(NewVisitActivity.isRunning));
+        if(NewVisitActivity.isRunning==true)
+            sendLocationString();
+        else if(NewVisitActivity.isRunning==false)
+            stopLocationUpdates();
        // getLocationString();
        //getLocatonObject();
-        updateUI();
+      //  updateUI();
     }
 
     private void updateUI() {
@@ -294,9 +306,9 @@ public class TrackLocService extends Service implements
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("p_id", "1");
-                params.put("p_lat", String.valueOf(mCurrentLocation.getLatitude()));
-                params.put("p_long", String.valueOf(mCurrentLocation.getLongitude()));
+                params.put("v_id", vid);
+                params.put("v_lat", String.valueOf(mCurrentLocation.getLatitude()));
+                params.put("v_long", String.valueOf(mCurrentLocation.getLongitude()));
 
                 return params;
             }
@@ -344,7 +356,7 @@ public class TrackLocService extends Service implements
 
     public void getLocatonObject(){
         Log.e("getLocationObject","called");
-        String url = "http://192.168.1.203/location_track/SendLocation.php?p_id=49";
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/SendLocation.php?p_id=49";
 
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -352,13 +364,13 @@ public class TrackLocService extends Service implements
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.e("Response",String.valueOf(response));
-                        Toast.makeText(getBaseContext(),"Response:"+response,Toast.LENGTH_SHORT).show();
+                      //  Toast.makeText(getBaseContext(),"Response:"+response,Toast.LENGTH_SHORT).show();
                         // the response is already constructed as a JSONObject!
                         try {
                             //Log.e("Response",String.valueOf(response));
                     String element=String.valueOf( response.getJSONArray("w1"));
                             Log.e("Response",String.valueOf( response.getJSONArray("w1")));
-                           Toast.makeText(getBaseContext(),"Element:"+element,Toast.LENGTH_SHORT).show();
+                       //    Toast.makeText(getBaseContext(),"Element:"+element,Toast.LENGTH_SHORT).show();
 
                             } catch (Exception e) {
                             e.printStackTrace();
@@ -381,11 +393,10 @@ public class TrackLocService extends Service implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         //return super.onStartCommand(intent, flags, startId);
         Log.e("Service", "onStart fired ....");
+      vid= intent.getStringExtra("id");
         mGoogleApiClient.connect();
         return START_NOT_STICKY;
 
-
     }
 
-
-}
+   }
