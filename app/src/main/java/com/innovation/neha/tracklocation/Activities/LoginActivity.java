@@ -2,7 +2,10 @@ package com.innovation.neha.tracklocation.Activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +20,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 import com.innovation.neha.tracklocation.AppController;
+import com.innovation.neha.tracklocation.Broadcasts.CheckInternet;
 import com.innovation.neha.tracklocation.R;
 import com.innovation.neha.tracklocation.Storage.SPrefUserInfo;
 
@@ -32,6 +36,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public static String name,pwd;
     String tag_string_req = "string_req";
     Intent intent;
+    CheckInternet checkInternet;
+    public SPrefUserInfo sPrefUserInfo;
 
 
 
@@ -48,6 +54,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         check.setOnClickListener(this);
 
         intent=new Intent(this,FrontActivity.class);
+
+        checkInternet=new CheckInternet();
+        sPrefUserInfo = new SPrefUserInfo(LoginActivity.this);
     }
 
     /*
@@ -67,7 +76,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         progressDialog.setMessage("Loading..");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/login.php?l_name="+name+"&&pass="+pwd;
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/login.php?l_name="+name+"&&pass="+pwd;
          Log.e("URL",url);
        //  Toast.makeText(LoginActivity.this,url,Toast.LENGTH_SHORT).show();
 
@@ -87,7 +96,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     else if(response.equals(""))
                         Toast.makeText(LoginActivity.this,"Slow Internet",Toast.LENGTH_SHORT).show();
                     else {
-                        SplashActivity.sPrefUserInfo.setUserInfo(response);
+                        //SplashActivity.sPrefUserInfo.setUserInfo(response);
+                        sPrefUserInfo.setUserInfo(response);
                         startActivity(intent);
                     }//Toast.makeText(getApplicationContext(), "iprice:"+String.valueOf(iprice), Toast.LENGTH_SHORT).show();
 
@@ -102,6 +112,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                progressDialog.dismiss();
+                Toast.makeText(LoginActivity.this,"Please enable internet connection",Toast.LENGTH_SHORT).show();
                 VolleyLog.d("TAG", "Error: " + error.getMessage());
                 Log.e("ResponseError", error.toString());
 
@@ -114,6 +126,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+
 
     @Override
     public void onClick(View view) {

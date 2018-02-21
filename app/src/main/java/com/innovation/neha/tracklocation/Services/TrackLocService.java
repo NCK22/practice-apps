@@ -35,8 +35,11 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.innovation.neha.tracklocation.Activities.FrontActivity;
 import com.innovation.neha.tracklocation.Activities.NewVisitActivity;
+import com.innovation.neha.tracklocation.Activities.SplashActivity;
 import com.innovation.neha.tracklocation.AppController;
+import com.innovation.neha.tracklocation.Storage.SPrefUserInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,19 +69,21 @@ public class TrackLocService extends Service implements
     LocationRequest mLocationRequest;
     Location mCurrentLocation;
     String mLastUpdateTime;
+
+
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback mLocationCallback;
     GoogleApiClient mGoogleApiClient;
     private GoogleApiClient.ConnectionCallbacks mConnectionCallbacks;
     GoogleApiClient.OnConnectionFailedListener mConnectionFailedListener;
 
-    GoogleApiClient googleApiClient;
 
     // Tag used to cancel the request
     String tag_string_req = "string_req";
 
-    String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/SendLocation.php";
-    public static String vid="";
+    String url = "http://www.thinkbank.co.in/Rajeshahi_app/SendLocation.php";
+    public static String vid="",uid="",stime="";
+    private SPrefUserInfo sPrefUserInfo;
     Context context,ctxperm;
     public static TrackLocService instance=null;
 
@@ -107,11 +112,11 @@ public class TrackLocService extends Service implements
         }
 
         createLocationRequest();
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+       /* mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
-                .build();
+                .build();*/
 
        /* tlat=(TextView)findViewById(R.id.tv_lat);
         tlng=(TextView)findViewById(R.id.tv_lng);
@@ -164,10 +169,15 @@ public class TrackLocService extends Service implements
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+
         stopSelf();
         instance=null;
         Log.e("Service","Destroyed");
+
+        Log.d(TAG, "onStop fired ..............");
+        mGoogleApiClient.disconnect();
+        Log.d(TAG, "isConnected ...............: " + mGoogleApiClient.isConnected());
+        super.onDestroy();
     }
     /*@Override
     protected void onStop() {
@@ -207,7 +217,10 @@ public class TrackLocService extends Service implements
     @Override
     public void onConnected(Bundle bundle) {
         Log.e("onConnected-isConnected", String.valueOf(mGoogleApiClient.isConnected()));
+        if(!sPrefUserInfo.getUserInfo().equals(""))
         startLocationUpdates();
+        else
+            Log.e("Location update stopped","logged out");
     }
 
     private void startLocationUpdates() {
@@ -218,9 +231,11 @@ public class TrackLocService extends Service implements
            permissionresult=false;
               return;
         }
-        PendingResult<Status> pendingResult = LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
+        if(mGoogleApiClient.isConnected()) {
+            PendingResult<Status> pendingResult = LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
             Log.d(TAG, "Location update started ..............: ");
+        }
 
 
     }
@@ -243,11 +258,27 @@ public class TrackLocService extends Service implements
         Log.e(TAG, "Firing onLocationChanged..............................................");
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+
+        Log.e("Location Accuracy", String.valueOf(location.getAccuracy()));
         Log.e("isRunning", String.valueOf(NewVisitActivity.isRunning));
-        if(NewVisitActivity.isRunning==true)
+        Log.e("isVisitStarted", String.valueOf(FrontActivity.isVisitStarted));
+        /*if(NewVisitActivity.isRunning==true)
             sendLocationString();
         else if(NewVisitActivity.isRunning==false)
-            stopLocationUpdates();
+            stopLocationUpdates();*/
+
+       // if(FrontActivity.isVisitStarted==true) {
+       /* if(FrontActivity.isVisitStarted==true)*/
+
+
+       if(sPrefUserInfo.getVisitInfo().equals("yes") && mCurrentLocation.getAccuracy()<=25){
+       Log.e("SLS",sPrefUserInfo.getUserInfo()+sPrefUserInfo.getVisitInfo());
+            if (!sPrefUserInfo.getUserInfo().equals("") && !sPrefUserInfo.getVisitInfo().equals(""))
+                sendLocationString();
+        /*else if(FrontActivity.isVisitStarted==false)*/
+            else if (sPrefUserInfo.getUserInfo().equals("") || sPrefUserInfo.getVisitInfo().equals(""))
+                stopLocationUpdates();
+        }
        // getLocationString();
        //getLocatonObject();
       //  updateUI();
@@ -293,6 +324,7 @@ public class TrackLocService extends Service implements
                     @Override
                     public void onResponse(String response) {
 
+                        if(response!=null)
                         Log.e("Response",String.valueOf(response));
                     }
                 },
@@ -300,15 +332,30 @@ public class TrackLocService extends Service implements
                     @Override
                     public void onErrorResponse(VolleyError error) {
 
-                        Log.e("ErrorResponse",String.valueOf(error));
+                        Log.e("ErrorResponse sendlocationstring",String.valueOf(error));
                     }
                 }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
+
+                if(uid.equals("")||vid.equals(""))
+                {
+                 uid=sPrefUserInfo.getUserInfo();
+                 vid=sPrefUserInfo.getVisitId();
+                }
+                params.put("u_id",uid);
                 params.put("v_id", vid);
                 params.put("v_lat", String.valueOf(mCurrentLocation.getLatitude()));
                 params.put("v_long", String.valueOf(mCurrentLocation.getLongitude()));
+                params.put("v_stime",stime);
+
+              /* Log.e("u_id",uid);
+                Log.e("v_id", vid);
+                Log.e("v_lat", String.valueOf(mCurrentLocation.getLatitude()));
+                Log.e("v_long", String.valueOf(mCurrentLocation.getLongitude()));
+                Log.e("v_stime",stime);*/
+
 
                 return params;
             }
@@ -356,7 +403,7 @@ public class TrackLocService extends Service implements
 
     public void getLocatonObject(){
         Log.e("getLocationObject","called");
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/SendLocation.php?p_id=49";
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/SendLocation.php?p_id=49";
 
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -393,9 +440,46 @@ public class TrackLocService extends Service implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         //return super.onStartCommand(intent, flags, startId);
         Log.e("Service", "onStart fired ....");
-      vid= intent.getStringExtra("id");
-        mGoogleApiClient.connect();
-        return START_NOT_STICKY;
+        sPrefUserInfo=new SPrefUserInfo(context);
+      //  uid=sPrefUserInfo.getUserInfo();
+
+        Log.e("u_id2", /*SplashActivity.*/sPrefUserInfo.getUserInfo());
+        if(intent!=null) {
+            uid = intent.getStringExtra("uid");
+            vid = intent.getStringExtra("vid");
+            stime = intent.getStringExtra("time");
+        }
+        else
+        {
+
+            uid = sPrefUserInfo.getUserInfo();
+            vid =sPrefUserInfo.getVisitId();
+            stime = sPrefUserInfo.getStartTimeInfo();
+        }
+/*
+        Log.e("u_id",uid);
+        Log.e("v_id",vid);
+       Log.e("stime", stime);
+*/
+      //  Log.e("sp uid",sPrefUserInfo.getUserInfo());
+      //  Log.e("sp vid", sPrefUserInfo.getVisitId());
+      //  Log.e("sp vinfo",sPrefUserInfo.getVisitInfo());
+      //  Log.e("sp stime ", sPrefUserInfo.getStartTimeInfo());
+
+        if(this.mGoogleApiClient!=null) {
+            if (this.mGoogleApiClient.isConnected())
+                this.mGoogleApiClient.disconnect();
+        }
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+               this.mGoogleApiClient.connect();
+        Log.e("After googleapiclient", String.valueOf(mGoogleApiClient.isConnected()));
+        return START_STICKY;
+
+
 
     }
 

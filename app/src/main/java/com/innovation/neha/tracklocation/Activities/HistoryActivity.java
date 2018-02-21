@@ -3,6 +3,7 @@ package com.innovation.neha.tracklocation.Activities;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ import com.innovation.neha.tracklocation.AppController;
 import com.innovation.neha.tracklocation.Pojos.Order;
 import com.innovation.neha.tracklocation.Pojos.SubOrder;
 import com.innovation.neha.tracklocation.R;
+import com.innovation.neha.tracklocation.Storage.SPrefUserInfo;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -63,6 +65,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
     View customView;
     Button yes,no;
     public static String dh_ord,dh_cust,dh_tot,u_id;
+    private SPrefUserInfo sPrefUserInfo;
 
 
     public static int mainAdapterPosition=0;
@@ -112,7 +115,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
 
        intent=new Intent(getApplicationContext(),PlaceOrderActivity.class);
 
-
+       sPrefUserInfo=new SPrefUserInfo(HistoryActivity.this);
         //Log.e("ResponseSize", String.valueOf(ord_hist_list.size()));
 
 
@@ -251,7 +254,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
             e.printStackTrace();
         }
 
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/editSubOrder.php?ord="+ord;
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/editSubOrder.php?ord="+ord;
         Log.e("URL",url);
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -320,7 +323,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
             e.printStackTrace();
         }
 
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/editOrder.php?ord="+ordforintent+"&&cust="+custforintent+"&&tot="+tot;
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/editOrder.php?ord="+ordforintent+"&&cust="+custforintent+"&&tot="+tot;
         Log.e("URL",url);
 
         JsonArrayRequest jsonRequest = new JsonArrayRequest
@@ -422,7 +425,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
     {
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
-        String url="http://www.thinkbank.co.in/Rajeshahi_app_testing/delSubOrder.php";
+        String url="http://www.thinkbank.co.in/Rajeshahi_app/delSubOrder.php";
         final String ord=ord_hist_list.get(mainAdapterPosition).getOrdNo();
         final String prod=subord_hist_list.get(position).getProd();
         final int wt=subord_hist_list.get(position).getWt();
@@ -491,8 +494,8 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
 
             ord_hist_list.remove(position);
 
-            // String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/delOrder.php?ord="+dh_ord+"&&cust="+dh_cust+"&&tot="+dh_tot;
-            String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/delOrder.php";
+            // String url = "http://www.thinkbank.co.in/Rajeshahi_app/delOrder.php?ord="+dh_ord+"&&cust="+dh_cust+"&&tot="+dh_tot;
+            String url = "http://www.thinkbank.co.in/Rajeshahi_app/delOrder.php";
             Log.e("URL", url);
 
             StringRequest strReq = new StringRequest(Request.Method.POST,
@@ -569,7 +572,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
     {
 
         try {
-            u_id= URLEncoder.encode(String.valueOf(SplashActivity.sPrefUserInfo.getUserInfo()), "UTF-8");
+            u_id= URLEncoder.encode(String.valueOf(/*SplashActivity.*/sPrefUserInfo.getUserInfo()), "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -581,7 +584,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
             ord_hist_list.clear();
 
         Log.e("populateWtSpinner","called");
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/GetOrderHistory.php?u_id="+u_id;
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/GetOrderHistory.php?u_id="+u_id;
         Log.e("URL",url);
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest

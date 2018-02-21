@@ -40,6 +40,7 @@
         <activity android:name=".Activities.DemoActivity" />
 
         <service android:name=".Services.TrackLocService" />
+        <service android:name=".Services.SendBroadcastService"/>
 
         <activity android:name=".Activities.PlaceOrderActivity" />
         <activity android:name=".Activities.HistoryActivity" />
@@ -68,9 +69,17 @@
         <receiver android:name=".Broadcasts.CheckLocation">
             <intent-filter>
                 <action android:name="android.location.PROVIDERS_CHANGED" />
+                <!--<action android:name="LocCheckService"/>-->
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+       <!-- <receiver android:name=".Broadcasts.CheckInternet">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>-->
+
 
     </application>
 

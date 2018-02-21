@@ -6,9 +6,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -36,9 +38,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.innovation.neha.tracklocation.AppController;
+import com.innovation.neha.tracklocation.Broadcasts.CheckInternet;
 import com.innovation.neha.tracklocation.R;
+import com.innovation.neha.tracklocation.Services.SendBroadcastService;
 import com.innovation.neha.tracklocation.Services.TrackLocService;
 import com.innovation.neha.tracklocation.Storage.SPrefUserInfo;
+//import com.innovation.neha.tracklocation.Storage.SPrefVisitInfo;
 
 import org.json.JSONObject;
 
@@ -57,7 +62,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
     TextView new_visit_edt;
     ProgressDialog progressDialog;
     public String tag_string_req = "stringrequest";
-    boolean isVisitStarted=false;
+    public static boolean isVisitStarted=false;
     PopupWindow popupWindow;
     private TextView dialog_result;
     View customView;
@@ -67,8 +72,16 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
     public static ConnectivityManager connMgr;
     public static android.net.NetworkInfo network_enabled;
     private boolean gps_enabled=false,broadcastFlag = false;
-    private String v_id,v_name,v_loc,dateforreq,timeforreq;;
+    private String v_name,v_loc,dateforreq,timeforreq;;
+    public static String v_id;
     private int mYear, mMonth, mDay, mHour, mMinute;
+    Intent servIntent;
+    static Context context;
+    public static AlertDialog.Builder builder;
+    public static boolean builderFlag=false;
+    private SPrefUserInfo sPrefUserInfo;
+    private CheckInternet checkInternet;
+//    private SPrefVisitInfo sPrefVisitInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,18 +114,27 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
 
         EnableRuntimePermissionToAccessCamera();
 
+        servIntent=new Intent(this,SendBroadcastService.class);
+
+//        startService(servIntent);
+
+
+        Log.e("FrontActivity","called");
         Intent intent=getIntent();
         if(intent.getExtras()!=null)
         {
             broadcastFlag=true;
             if(intent.getStringExtra("flag").equals("locoff"))
             {
-             isLocationEnabled();
-
+                Log.e("builderFlag", String.valueOf(builderFlag));
+                     isLocationEnabled();
             }
+
         }
 
-
+        sPrefUserInfo=new SPrefUserInfo(FrontActivity.this);
+        checkInternet=new CheckInternet();
+     //   sPrefVisitInfo=new SPrefVisitInfo(this);
 
     }
 
@@ -151,11 +173,15 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // FIRE ZE MISSILES!
-                        SplashActivity.sPrefUserInfo.setUserInfo("");
-
+                        //SplashActivity.sPrefUserInfo.setUserInfo("");
+                        sPrefUserInfo.setUserInfo("");
+                        sPrefUserInfo.setVisitId("");
+                        if(TrackLocService.instance!=null)
+                            TrackLocService.instance.stopSelf();
+                        TrackLocService.instance=null;
                         Intent intent=new Intent(FrontActivity.this,LoginActivity.class);
-                        startActivity(intent);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_NO_ANIMATION );
+                        startActivity(intent);
                         finish();
 
                     }
@@ -180,13 +206,14 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
         String url;
         if(broadcastFlag==true)
         {
-            SPrefUserInfo sPrefUserInfo = new SPrefUserInfo(this);
+            SPrefUserInfo sPrefUserInfo = new SPrefUserInfo(FrontActivity.this);
             sPrefUserInfo.getUserInfo();
-               url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/getCurrentVisit.php?u_id="+sPrefUserInfo.getUserInfo();
+               url = "http://www.thinkbank.co.in/Rajeshahi_app/getCurrentVisit.php?u_id="+sPrefUserInfo.getUserInfo();
         }
         else {
-            Log.e("userinfo", SplashActivity.sPrefUserInfo.getUserInfo());
-            url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/getCurrentVisit.php?u_id=" + SplashActivity.sPrefUserInfo.getUserInfo();
+            //Log.e("userinfo", SplashActivity.sPrefUserInfo.getUserInfo());
+            Log.e("userinfo front", sPrefUserInfo.getUserInfo());
+            url = "http://www.thinkbank.co.in/Rajeshahi_app/getCurrentVisit.php?u_id=" + /*SplashActivity.*/sPrefUserInfo.getUserInfo();
         }
         Log.e("URL",url);
 
@@ -205,15 +232,27 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
                             {
 
                                 v_id=response.getString("w1");
+                                sPrefUserInfo.setVisitId(response.getString("w1"));
+                                Log.e("sp front vid",sPrefUserInfo.getVisitId());
                               //  v_name=response.getString("w2");
                                // v_loc=response.getString("w3");
                                 stopVisit();
-
+                                isVisitStarted=false;
 
                             }
-
-                            Log.e("In getCurrentVisit",response.getString("w1"));
+                            else
                                 isVisitStarted=true;
+                            Log.e("In getCurrentVisit",response.getString("w1"));
+                            sPrefUserInfo.setVisitId(response.getString("w1"));
+                            Log.e("sp front vid",sPrefUserInfo.getVisitId());
+
+                                sPrefUserInfo.setVisitInfo("yes");
+                            Log.e("isVisitStarted", String.valueOf(isVisitStarted));
+                            if(isVisitStarted==true)
+                            {
+                                isLocationEnabled();
+                            }
+
 
 
                         } catch (Exception e) {
@@ -227,6 +266,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
                     public void onErrorResponse(VolleyError error) {
                         error.printStackTrace();
                         isVisitStarted=false;
+                        sPrefUserInfo.setVisitInfo("no");
                         progressDialog.dismiss();
                         Log.e("ResponseError",String.valueOf(error));
                     }
@@ -234,11 +274,17 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
 
         AppController.getInstance().addToRequestQueue(jsonRequest, tag_string_req);
 
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        context=this;
+        Log.e("inside","onResume");
+        //Log.e("isVisitStarted", String.valueOf(isVisitStarted));
+
 
         if(broadcastFlag==false) {
             connMgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -257,6 +303,9 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
                     Log.e("network", "if");
                     getCurrentVisit();
 
+
+
+
                 }
             /*
             *  if not connected, ask to enable internet
@@ -271,6 +320,20 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
             }
 
         }
+
+      //  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+
+            this.registerReceiver(checkInternet,
+                    new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+       // }
+       /* else
+        {
+            if(TrackLocService.instance!=null)
+                TrackLocService.instance=null;
+            //Intent intent=new Intent(Fthis,TrackLocService.class);
+            startService(new Intent(FrontActivity.this,TrackLocService.class));
+        }*/
+
     }
 
     @Override
@@ -429,6 +492,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
 
     public void isLocationEnabled()
     {
+        builderFlag=true;
         LocationManager lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
         gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
@@ -436,7 +500,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
         if (!gps_enabled) {
 
 
-            final AlertDialog.Builder builder =
+            AlertDialog.Builder builder =
                     new AlertDialog.Builder(this);
             final String action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
             final String message = "Disabling location will stop"
@@ -449,6 +513,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
                                 public void onClick(DialogInterface d, int id) {
                                     //context.this.startActivityForResult(new Intent(action),1);
                                     d.dismiss();
+                                 //   builderFlag=false;
                                     getCurrentVisit();
                                   //  broadcastFlag=false;
                                 }
@@ -464,6 +529,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
                             });
             builder.setCancelable(false);
             builder.create().show();
+
         }
     }
 
@@ -513,9 +579,9 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
 
         // stopService(Servintent);
             if(TrackLocService.instance!=null)
-                TrackLocService.instance.onDestroy();
+                TrackLocService.instance.stopSelf();/*onDestroy()*/;
 
-            String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/postVisitData.php";
+            String url = "http://www.thinkbank.co.in/Rajeshahi_app/postVisitData.php";
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     url,
                     new Response.Listener<String>() {
@@ -593,6 +659,18 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    @Override
+    protected void onDestroy() {
+
+        try {
+            if (checkInternet != null)
+                unregisterReceiver(checkInternet);
+        }catch(IllegalArgumentException e)
+        {
+            e.printStackTrace();
+        }
+        super.onDestroy();
+    }
 }
 
 

@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.innovation.neha.tracklocation.Activities.FrontActivity;
 import com.innovation.neha.tracklocation.Activities.NewVisitActivity;
+import com.innovation.neha.tracklocation.Services.TrackLocService;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -34,15 +35,24 @@ public class CheckLocation extends BroadcastReceiver {
     public void onReceive( Context context,  Intent intent) {
 
         this.context=context;
-        Log.e("check interet", "onreceive");
+        Log.e("check location", "onreceive");
 
        intent =new Intent(context,FrontActivity.class);
        intent.putExtra("flag","locoff");
 
         LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
         gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if (!gps_enabled)
+        if (!gps_enabled) {
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
             context.startActivity(intent);
+        }
+
+        if (gps_enabled) {
+            Intent intent1=new Intent(context, TrackLocService.class);
+          //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startService(intent);
+        }
 
            // isLocationEnabled();
 

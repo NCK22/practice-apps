@@ -24,10 +24,10 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -54,6 +54,8 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.innovation.neha.tracklocation.AppController;
 import com.innovation.neha.tracklocation.R;
 import com.innovation.neha.tracklocation.Services.TrackLocService;
+import com.innovation.neha.tracklocation.Storage.SPrefUserInfo;
+//import com.innovation.neha.tracklocation.Storage.SPrefVisitInfo;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -94,6 +96,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
    // private boolean network_enabled = false;
     ConnectivityManager connMgr;
     android.net.NetworkInfo network_enabled;
+    private SPrefUserInfo sPrefUserInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +111,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
         date_time_layout = (LinearLayout) findViewById(R.id.date_time_layout);
         submit = (Button) findViewById(R.id.btn_vsubmit);
 
+        sPrefUserInfo=new SPrefUserInfo(NewVisitActivity.this);
 
         submit.setOnClickListener(this);
         date_time_layout.setOnClickListener(this);
@@ -140,7 +144,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
 
 
 
-        Log.e("visit",SplashActivity.sPrefUserInfo.getVisitInfo().toString());
+     //   Log.e("visit",SplashActivity.sPrefUserInfo.getVisitInfo().toString());
 
 
      /*   if(SplashActivity.sPrefUserInfo.getVisitInfo().equals("")||
@@ -239,7 +243,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
       //  String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/getCurrentVisit.php?u_id="+SplashActivity.sPrefUserInfo.getUserInfo();
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/getCurrentVisit.php?u_id="+SplashActivity.sPrefUserInfo.getUserInfo();
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/getCurrentVisit.php?u_id="+/*SplashActivity.*/sPrefUserInfo.getUserInfo();
          Log.e("URL",url);
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -461,7 +465,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
     public void generateId() {
       //  progressDialog.setMessage("Loading..");
       //  progressDialog.show();
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchVisitId.php";
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/fetchVisitId.php";
         // Log.e("URL",url);
 
         StringRequest strReq = new StringRequest(Request.Method.GET,
@@ -478,6 +482,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
                     visit_id.setText(String.valueOf(v_id));
                     Log.e("In Generateid",String.valueOf(v_id));
                     submit.setText("START");
+                    sPrefUserInfo.setVisitId(response);
                     progressDialog.dismiss();
 
                     //Toast.makeText(getApplicationContext(), "iprice:"+String.valueOf(iprice), Toast.LENGTH_SHORT).show();
@@ -537,7 +542,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
 
-            String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/postVisitData.php";
+            String url = "http://www.thinkbank.co.in/Rajeshahi_app/postVisitData.php";
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     url,
                     new Response.Listener<String>() {
@@ -550,6 +555,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
                             dialog_result.setText("Journey Started!");
                             verify.setText("OK");
                             isRunning=true;
+                            sPrefUserInfo.setVisitInfo("yes");
                             popupWindow = new PopupWindow(
                                     customView,
                                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -565,6 +571,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
                             popupWindow.showAtLocation(getCurrentFocus(), Gravity.CENTER, 0, 0);
 
                             Servintent.putExtra("id",visit_id.getText().toString());
+                            Servintent.putExtra("time",dateforreq+" "+timeforreq);
                             startService(Servintent);
                             date.setText("");
                             time.setText("");
@@ -586,7 +593,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
                 protected Map<String, String> getParams() {
                     Map<String, String> params = new HashMap<>();
                     params.put("v_id", visit_id.getText().toString());
-                    params.put("u_id",SplashActivity.sPrefUserInfo.getUserInfo());
+                    params.put("u_id",/*SplashActivity.*/sPrefUserInfo.getUserInfo());
                     params.put("v_name", visit_name.getText().toString());
                     params.put("v_loc", visit_loc.getText().toString());
                     params.put("v_time", dateforreq+" "+timeforreq);
@@ -605,7 +612,9 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
 
         }
 
-        SplashActivity.sPrefUserInfo.setVisitInfo("yes");
+       // sPrefVisitInfo.setVisitInfo("yes");
+     //   SplashActivity.sPrefUserInfo.setStartTimeInfo(dateforreq+" "+timeforreq);
+        Log.e("timeinfo",/*SplashActivity.*/sPrefUserInfo.getStartTimeInfo());
     }
 
     public void stopVisit() {
@@ -641,7 +650,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
             if(TrackLocService.instance!=null)
             TrackLocService.instance.onDestroy();
 
-            String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/postVisitData.php";
+            String url = "http://www.thinkbank.co.in/Rajeshahi_app/postVisitData.php";
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     url,
                     new Response.Listener<String>() {
@@ -652,6 +661,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
 
                             progressDialog.dismiss();
                             isRunning=false;
+                            sPrefUserInfo.setVisitInfo("");
                             dialog_result.setText("Journey Stopped!");
                             verify.setText("OK");
 
@@ -706,7 +716,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
             AppController.getInstance().addToRequestQueue(stringRequest, tag_string_req);
         }
 
-        SplashActivity.sPrefUserInfo.setVisitInfo("no");
+      //  sPrefVisitInfo.setVisitInfo("no");
     }
 
     public void isLocationEnabled()

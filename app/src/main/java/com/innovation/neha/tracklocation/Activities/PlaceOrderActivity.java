@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -52,6 +53,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.innovation.neha.tracklocation.AppController;
 import com.innovation.neha.tracklocation.R;
+import com.innovation.neha.tracklocation.Storage.SPrefUserInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,7 +61,10 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -123,7 +128,7 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
 
     private static final int CAMERA_CAPTURE_CODE = 501;
 
-    Button CaptureImageFromCamera,UploadImageToServer,yes,no;
+    Button CaptureImageFromCamera,UploadImageToServer,yes,no,chooseImageFromGallery;
     ImageView ImageViewHolder;
     EditText imageName;
     ProgressDialog progressDialog ;
@@ -134,12 +139,14 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
     String GetImageNameFromEditText;
     String ImageNameFieldOnServer = "image_name" ;
     String ImagePathFieldOnServer = "image_path" ;
-    String ImageUploadPathOnSever ="http://www.thinkbank.co.in/Rajeshahi_app_testing/capture_img_upload_to_server.php" ;
+    String ImageUploadPathOnSever ="http://www.thinkbank.co.in/Rajeshahi_app/capture_img_upload_to_server.php" ;
     String tag_string_req2 = "string_req";
     private Uri mCameraFileUri;
 
-
     Animation slideDownAnimation;
+
+    private SPrefUserInfo sPrefUserInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -147,6 +154,7 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
+        sPrefUserInfo=new SPrefUserInfo(PlaceOrderActivity.this);
 
         ll_cash=(LinearLayout)findViewById(R.id.ll_cash);
         ll_cheque=(LinearLayout)findViewById(R.id.ll_cheque);
@@ -195,6 +203,7 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
       //  iplus=(ImageView)findViewById(R.id.img_overplus);
 
         CaptureImageFromCamera = (Button)findViewById(R.id.btn_Capture);
+        chooseImageFromGallery = (Button)findViewById(R.id.btn_Choose);
         ImageViewHolder = (ImageView)findViewById(R.id.imageView);
         UploadImageToServer = (Button) findViewById(R.id.btn_upload);
 
@@ -216,6 +225,7 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
         dd.setOnClickListener(this);
 
         CaptureImageFromCamera.setOnClickListener(this);
+        chooseImageFromGallery.setOnClickListener(this);
         UploadImageToServer.setOnClickListener(this);
 
         product.setOnItemSelectedListener(this);
@@ -937,7 +947,7 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                                     payObject.put("chequeno",cheque_no.getText().toString());
                                     payObject.put("ddno",dd_no.getText().toString());
                                     payObject.put("cust",clnt_name.getText().toString());
-                                    payObject.put("user",SplashActivity.sPrefUserInfo.getUserInfo());
+                                    payObject.put("user",/*SplashActivity.*/sPrefUserInfo.getUserInfo());
 
                                     Log.e("Json",payObject.toString());
 
@@ -1004,7 +1014,9 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                                     UploadImageWithVolly();
                                     break;
 */
-
+            case R.id.btn_Choose :
+                chooseImage();
+                break;
 
 
         }
@@ -1209,8 +1221,8 @@ Log.e("Inside","putsuborder");
 
 
         Log.e("populateProdSpinner","called");
-      //  String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchProdSpin.php";
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchProdSpin.php";
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/fetchProdSpin.php";
+       // String url = "http://www.thinkbank.co.in/Rajeshahi_app_testingfetchProdSpin.php";
 
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -1284,7 +1296,8 @@ Log.e("Inside","putsuborder");
             e.printStackTrace();
         }
 
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchWghtSpin.php?p_name="+prod;
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/fetchWghtSpin.php?p_name="+prod;
+        //String url = "http://www.thinkbank.co.in/Rajeshahi_app_testingfetchWghtSpin.php?p_name="+prod;
         Log.e("URL",url);
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -1594,7 +1607,8 @@ Log.e("Inside","putsuborder");
         }
 
 
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchProdPrice.php?p_name="+prod+"&&p_weight="+wt;
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/fetchProdPrice.php?p_name="+prod+"&&p_weight="+wt;
+      //  String url = "http://www.thinkbank.co.in/Rajeshahi_app_testingfetchProdPrice.php?p_name="+prod+"&&p_weight="+wt;
        // Log.e("URL",url);
 
         StringRequest strReq = new StringRequest(Request.Method.GET,
@@ -1728,9 +1742,11 @@ Log.e("subeditflag", String.valueOf(subEditFlag));
            // Toast.makeText(getApplicationContext(), "Editflag " + String.valueOf(editFlag) + " subEditFlag: "
             //        + String.valueOf(subEditFlag), Toast.LENGTH_SHORT).show();
             if (editFlag == true)
-                url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/updateAllData.php";
+                url = "http://www.thinkbank.co.in/Rajeshahi_app/updateAllData.php";
+           // url = "http://www.thinkbank.co.in/Rajeshahi_app_testingupdateAllData.php";
             else
-                url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/postAllData.php";
+                url = "http://www.thinkbank.co.in/Rajeshahi_app/postAllData.php";                
+              //  url = "http://www.thinkbank.co.in/Rajeshahi_app_testingpostAllData.php";
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     url,
                     new Response.Listener<String>() {
@@ -1830,7 +1846,8 @@ Log.e("subeditflag", String.valueOf(subEditFlag));
         progressDialog.setMessage("Please wait");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/capture_img_upload_to_server.php";
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/capture_img_upload_to_server.php";
+       // String url = "http://www.thinkbank.co.in/Rajeshahi_app_testingcapture_img_upload_to_server.php";
 
         ByteArrayOutputStream byteArrayOutputStreamObject ;
 
@@ -1906,6 +1923,18 @@ Log.e("subeditflag", String.valueOf(subEditFlag));
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    private void chooseImage()
+    {
+       // Intent intent = new Intent();
+       // intent.setType("image/*");
+      //  intent.setAction(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+
+        file = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"),200);
     }
 
     @Override
@@ -2038,7 +2067,72 @@ Log.e("subeditflag", String.valueOf(subEditFlag));
                     e.printStackTrace();
                 }
             }
+            else if(requestCode==200)
+            {
+
+                Uri selectedImage = data.getData();
+                File imageFile = new File(getRealPathFromURI(selectedImage));
+
+
+                if(imageFile==null)
+                    Log.e("imagefile","null");
+                else
+                    Log.e("imagefile", String.valueOf(imageFile));
+                Log.e("image before", String.valueOf(imageFile.length()));
+
+
+                bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                    ImageViewHolder.setImageBitmap(bitmap);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                        Log.e("Image size before", String.valueOf(bitmap.getAllocationByteCount()));
+
+                    imageFile=new Compressor(this)
+                            .setMaxWidth(100)
+                            .setMaxHeight(200)
+                            .setQuality(80)
+                            .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                            .compressToFile(imageFile);
+
+                    Log.e("image after", String.valueOf(imageFile.length()));
+                    mCameraFileUri = FileProvider.getUriForFile(PlaceOrderActivity.this,PlaceOrderActivity.this.getApplicationContext().getPackageName() + ".provider",imageFile);
+                    Log.e("mCameraFileURI", String.valueOf(mCameraFileUri));
+                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), mCameraFileUri);
+                 /*  bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new OutputStream() {
+                       @Override
+                       public void write(int i) throws IOException {
+
+                       }
+                   });*/
+                    ImageViewHolder.setImageBitmap(bitmap);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                        Log.e("Image size after", String.valueOf(bitmap.getAllocationByteCount()));
+
+                } catch (FileNotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
         }
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+
+        String thePath = "no-path-found";
+        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(contentURI, filePathColumn, null, null, null);
+        if(cursor!=null) {
+            if (cursor.moveToFirst()) {
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                thePath = cursor.getString(columnIndex);
+            }
+            cursor.close();
+        }
+        return  thePath;
     }
 
     // Requesting runtime permissions.
@@ -2105,7 +2199,7 @@ Log.e("subeditflag", String.valueOf(subEditFlag));
 
 
         Log.e("populateProdSpinner","called");
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchClientList.php";
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/fetchClientList.php";
 
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest

@@ -26,6 +26,7 @@ import com.innovation.neha.tracklocation.AppController;
 import com.innovation.neha.tracklocation.Pojos.Customer;
 import com.innovation.neha.tracklocation.Pojos.Order;
 import com.innovation.neha.tracklocation.R;
+import com.innovation.neha.tracklocation.Storage.SPrefUserInfo;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,6 +48,7 @@ public class CustHistoryActivity extends AppCompatActivity implements View.OnCli
     String tag_string_req="jsonobject_req";
     private RecyclerView recyclerView;
     RecyclerViewCustAdapter adapter;
+    private SPrefUserInfo sPrefUserInfo;
 
 
     @Override
@@ -63,6 +65,8 @@ public class CustHistoryActivity extends AppCompatActivity implements View.OnCli
 
         recyclerView = (RecyclerView) findViewById(R.id.rv_cust_history);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        sPrefUserInfo=new SPrefUserInfo(CustHistoryActivity.this);
 
 
     }
@@ -111,7 +115,7 @@ public class CustHistoryActivity extends AppCompatActivity implements View.OnCli
     {
 
         try {
-            u_id= URLEncoder.encode(String.valueOf(SplashActivity.sPrefUserInfo.getUserInfo()), "UTF-8");
+            u_id= URLEncoder.encode(String.valueOf(/*SplashActivity.*/sPrefUserInfo.getUserInfo()), "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -124,7 +128,7 @@ public class CustHistoryActivity extends AppCompatActivity implements View.OnCli
             cust_hist_list.clear();
 
         Log.e("populateWtSpinner","called");
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/getCustHistory.php?u_id="+u_id;
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/getCustHistory.php?u_id="+u_id;
         Log.e("URL",url);
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest

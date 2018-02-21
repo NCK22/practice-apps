@@ -12,17 +12,17 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:weightSum="5"
         android:orientation="horizontal"
         android:background="#ffffff"
-        android:layout_margin="4dp">
+        android:layout_margin="0dp">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-
+            android:weightSum="3"
             android:background="#E6EE9C"
             android:orientation="vertical">
 
@@ -30,19 +30,25 @@
                 android:id="@+id/tv_eh_prod"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:text=""
                 android:ellipsize="none"
-                android:maxLines="5"
+                android:maxLines="3"
                 android:scrollHorizontally="false"
                 android:gravity="center"
                 android:textStyle="bold"
                 android:textColor="#42A5F5"
            />
+            
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="6dp" />
 
             <TextView
                 android:id="@+id/tv_eh_wt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:text="250 gms"
                 android:gravity="center"
                 android:textStyle="bold"

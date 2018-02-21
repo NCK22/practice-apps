@@ -17,7 +17,7 @@ import com.innovation.neha.tracklocation.Storage.SPrefUserInfo;
 public class SplashActivity extends AppCompatActivity {
 
     Intent intent;
-    public static SPrefUserInfo sPrefUserInfo;
+    private SPrefUserInfo sPrefUserInfo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         Log.e("Splashscreen","created");
-        sPrefUserInfo = new SPrefUserInfo(this);
+        sPrefUserInfo = new SPrefUserInfo(SplashActivity.this);
 
         Thread splash= new Thread(){
             public void run(){

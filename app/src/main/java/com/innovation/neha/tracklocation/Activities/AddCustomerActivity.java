@@ -33,6 +33,7 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.innovation.neha.tracklocation.AppController;
 import com.innovation.neha.tracklocation.R;
 import com.innovation.neha.tracklocation.Services.TrackLocService;
+import com.innovation.neha.tracklocation.Storage.SPrefUserInfo;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -55,6 +56,7 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
     Button verify;
     String tag_string_req="string_req",lat,lng,u_id;
     int c_id = 0;
+    private SPrefUserInfo sPrefUserInfo;
 
 
     @Override
@@ -84,6 +86,8 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
         verify.setText("Submit");
 
         Intent intent=getIntent();
+
+        sPrefUserInfo=new SPrefUserInfo(AddCustomerActivity.this);
 
         /*
         * for edit customer
@@ -239,12 +243,12 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
 * sending data to server
 * */
         try {
-            u_id= URLEncoder.encode(String.valueOf(SplashActivity.sPrefUserInfo.getUserInfo()), "UTF-8");
+            u_id= URLEncoder.encode(String.valueOf(/*SplashActivity.*/sPrefUserInfo.getUserInfo()), "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
-            final String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/postCustData.php";
+            final String url = "http://www.thinkbank.co.in/Rajeshahi_app/postCustData.php";
 
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     url,
@@ -325,7 +329,7 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
     public void generateId() {
         //  progressDialog.setMessage("Loading..");
         //  progressDialog.show();
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchCustId.php";
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app/fetchCustId.php";
         // Log.e("URL",url);
 
         StringRequest strReq = new StringRequest(Request.Method.GET,
