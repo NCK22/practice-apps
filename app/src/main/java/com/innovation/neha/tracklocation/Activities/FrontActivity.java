@@ -9,8 +9,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.ConnectivityManager;
 import android.os.Build;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -39,6 +41,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.innovation.neha.tracklocation.AppController;
 import com.innovation.neha.tracklocation.Broadcasts.CheckInternet;
+import com.innovation.neha.tracklocation.Broadcasts.CheckLocation;
 import com.innovation.neha.tracklocation.R;
 import com.innovation.neha.tracklocation.Services.SendBroadcastService;
 import com.innovation.neha.tracklocation.Services.TrackLocService;
@@ -81,7 +84,9 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
     public static boolean builderFlag=false;
     private SPrefUserInfo sPrefUserInfo;
     private CheckInternet checkInternet;
+    private CheckLocation checkLocation;
 //    private SPrefVisitInfo sPrefVisitInfo;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +139,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
 
         sPrefUserInfo=new SPrefUserInfo(FrontActivity.this);
         checkInternet=new CheckInternet();
+        checkLocation=new CheckLocation();
      //   sPrefVisitInfo=new SPrefVisitInfo(this);
 
     }
@@ -182,6 +188,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
                         Intent intent=new Intent(FrontActivity.this,LoginActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_NO_ANIMATION );
                         startActivity(intent);
+                        if(broadcastFlag==true)
                         finish();
 
                     }
@@ -208,12 +215,12 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
         {
             SPrefUserInfo sPrefUserInfo = new SPrefUserInfo(FrontActivity.this);
             sPrefUserInfo.getUserInfo();
-               url = "http://www.thinkbank.co.in/Rajeshahi_app/getCurrentVisit.php?u_id="+sPrefUserInfo.getUserInfo();
+               url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/getCurrentVisit.php?u_id="+sPrefUserInfo.getUserInfo();
         }
         else {
             //Log.e("userinfo", SplashActivity.sPrefUserInfo.getUserInfo());
             Log.e("userinfo front", sPrefUserInfo.getUserInfo());
-            url = "http://www.thinkbank.co.in/Rajeshahi_app/getCurrentVisit.php?u_id=" + /*SplashActivity.*/sPrefUserInfo.getUserInfo();
+            url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/getCurrentVisit.php?u_id=" + /*SplashActivity.*/sPrefUserInfo.getUserInfo();
         }
         Log.e("URL",url);
 
@@ -250,7 +257,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
                             Log.e("isVisitStarted", String.valueOf(isVisitStarted));
                             if(isVisitStarted==true)
                             {
-                                isLocationEnabled();
+   //                             isLocationEnabled();
                             }
 
 
@@ -287,6 +294,8 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
 
 
         if(broadcastFlag==false) {
+
+           // isLocationEnabled();
             connMgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
 
             network_enabled = connMgr.getActiveNetworkInfo();
@@ -303,10 +312,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
                     Log.e("network", "if");
                     getCurrentVisit();
 
-
-
-
-                }
+               }
             /*
             *  if not connected, ask to enable internet
             * */
@@ -325,6 +331,9 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
 
             this.registerReceiver(checkInternet,
                     new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+        /*this.registerReceiver(checkLocation,
+                new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));*/
        // }
        /* else
         {
@@ -362,6 +371,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT
                     );
+
 
                    // popupWindow.setOutsideTouchable(true);
                     popupWindow.showAtLocation(place_order_layout, Gravity.CENTER, 0, 0);
@@ -499,8 +509,10 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
 
         if (!gps_enabled) {
 
+            if(builder!=null)
+                builder=null;
 
-            AlertDialog.Builder builder =
+            builder =
                     new AlertDialog.Builder(this);
             final String action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
             final String message = "Disabling location will stop"
@@ -581,7 +593,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
             if(TrackLocService.instance!=null)
                 TrackLocService.instance.stopSelf();/*onDestroy()*/;
 
-            String url = "http://www.thinkbank.co.in/Rajeshahi_app/postVisitData.php";
+            String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/postVisitData.php";
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     url,
                     new Response.Listener<String>() {
@@ -665,6 +677,9 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
         try {
             if (checkInternet != null)
                 unregisterReceiver(checkInternet);
+
+           /* if (checkLocation != null)
+                unregisterReceiver(checkLocation);*/
         }catch(IllegalArgumentException e)
         {
             e.printStackTrace();

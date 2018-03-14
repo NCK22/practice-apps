@@ -370,10 +370,10 @@
                         android:layout_marginRight="2dp"
                         android:layout_marginStart="2dp"
 
-                        android:layout_weight="6.5"
+                        android:layout_weight="6.4"
                         android:background="#BBDEFB"
                         android:orientation="horizontal"
-                        android:weightSum="3">
+                        android:weightSum="2">
 
                         <LinearLayout
                             android:id="@+id/ll_cash"
@@ -400,14 +400,48 @@
                                 android:inputType="numberDecimal"
                                 android:hint="Rcvd Amt" />
 
-                            <EditText
+                           <!-- <EditText
                                 android:id="@+id/et_cash_rcvd"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:enabled="false"
                                 android:hint="Rcvd Amt"
-                                android:visibility="invisible" />
+                                android:visibility="invisible" />-->
+                        </LinearLayout>
 
+                        <LinearLayout
+                            android:id="@+id/ll_credit"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="#BBDEFB"
+                            android:orientation="vertical"
+                            android:visibility="visible">
+
+                            <RadioButton
+                                android:id="@+id/rb_credit"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Credit" />
+
+
+                            <EditText
+                                android:id="@+id/et_credit_rcvd_amt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:enabled="false"
+                                android:singleLine="true"
+                                android:maxLines="1"
+                                android:inputType="numberDecimal"
+                                android:hint="Crdt Amt" />
+
+                          <!--  <EditText
+                                android:id="@+id/et_credit_rcvd"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:enabled="false"
+                                android:hint="Rcvd Amt"
+                                android:visibility="invisible" />-->
 
                         </LinearLayout>
 
@@ -417,7 +451,8 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:background="#BBDEFB"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:visibility="gone">
 
 
                             <RadioButton
@@ -452,10 +487,10 @@
                             android:id="@+id/ll_dd"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-
                             android:layout_weight="1"
                             android:background="#BBDEFB"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:visibility="gone">
 
                             <RadioButton
                                 android:id="@+id/rb_dd"
@@ -485,7 +520,19 @@
 
                         </LinearLayout>
 
+
                     </LinearLayout>
+
+
+                    <TextView
+                        android:id="@+id/tv_prev_bal"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.1"
+                        android:textSize="17sp"
+                        android:layout_gravity="center_vertical"
+                        android:text="Previous balance:"
+                        android:visibility="gone"/>
                 </LinearLayout>
 
                 <!--/RadioGroup-->

@@ -61,6 +61,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -97,6 +98,8 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
     ConnectivityManager connMgr;
     android.net.NetworkInfo network_enabled;
     private SPrefUserInfo sPrefUserInfo;
+
+    DatePickerDialog datePickerDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -243,7 +246,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
       //  String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/getCurrentVisit.php?u_id="+SplashActivity.sPrefUserInfo.getUserInfo();
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/getCurrentVisit.php?u_id="+/*SplashActivity.*/sPrefUserInfo.getUserInfo();
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/getCurrentVisit.php?u_id="+/*SplashActivity.*/sPrefUserInfo.getUserInfo();
          Log.e("URL",url);
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -266,11 +269,18 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
                                 visit_id.setText(response.getString("w1"));
                                 visit_name.setText(response.getString("w2"));
                                 visit_loc.setText(response.getString("w3"));
+                               /* Timestamp t= Timestamp.valueOf(response.getString("w4"));
+                                long timeInMilliSeconds = t.getTime();*/
 
                                 visit_name.setEnabled(false);
-
+                              /*  datePicker();
+                                datePickerDialog.cancel();
+                                datePickerDialog.getDatePicker().setMinDate(timeInMilliSeconds - 1000);
+*/
                                 Log.e("In getCurrentVisit",response.getString("w1"));
                                 submit.setText("STOP");
+
+
                                 progressDialog.dismiss();
                             }
 
@@ -386,7 +396,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
         mMonth = c.get(Calendar.MONTH);
         mDay = c.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+        datePickerDialog = new DatePickerDialog(this,
                 new DatePickerDialog.OnDateSetListener() {
 
                     @Override
@@ -403,6 +413,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
                 }, mYear, mMonth, mDay);
 
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() - 1000);
         datePickerDialog.show();
 
     }
@@ -465,7 +476,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
     public void generateId() {
       //  progressDialog.setMessage("Loading..");
       //  progressDialog.show();
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/fetchVisitId.php";
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchVisitId.php";
         // Log.e("URL",url);
 
         StringRequest strReq = new StringRequest(Request.Method.GET,
@@ -542,7 +553,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
 
-            String url = "http://www.thinkbank.co.in/Rajeshahi_app/postVisitData.php";
+            String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/postVisitData.php";
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     url,
                     new Response.Listener<String>() {
@@ -650,7 +661,7 @@ public class NewVisitActivity extends AppCompatActivity implements ActivityCompa
             if(TrackLocService.instance!=null)
             TrackLocService.instance.onDestroy();
 
-            String url = "http://www.thinkbank.co.in/Rajeshahi_app/postVisitData.php";
+            String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/postVisitData.php";
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     url,
                     new Response.Listener<String>() {

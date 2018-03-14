@@ -67,6 +67,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -76,6 +77,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.*;
+
+
 
 import fr.ganfra.materialspinner.MaterialSpinner;
 import id.zelory.compressor.Compressor;
@@ -98,13 +102,13 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
     List<String>list_clnt=new ArrayList<String>();
     String[] clients;
 
-    EditText cash_amt,cheque_amt,dd_amt,cheque_no,dd_no,qty;
+    EditText cash_amt,cheque_amt,dd_amt,credit_amt,cheque_no,dd_no,qty;
     AutoCompleteTextView clnt_name;
-    RadioButton cash,cheque,dd;
-    LinearLayout ll_cash,ll_cheque,ll_dd,ll_radio_parent,ll_image;
+    RadioButton cash,cheque,dd,credit;
+    LinearLayout ll_cash,ll_cheque,ll_dd,ll_credit,ll_radio_parent,ll_image;
     FloatingActionButton plus,minus;
     ImageView iplus;
-    TextView ord_no,bag,price,total,restamt;
+    TextView ord_no,bag,price,total,restamt,prevbal;
     Button submit,done;
     View customView,customView2;
     TextView dialog_result,dialog_result2;
@@ -112,6 +116,9 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
     Button verify;
     public static PopupWindow popupWindow,popupWindow2;
     public static int ordercnt=0;
+    DecimalFormat dec;
+
+
 
    HashMap<String,JSONObject> suborderMap=new HashMap<String,JSONObject>();
     JSONObject payObject=new JSONObject();
@@ -121,10 +128,11 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
 
     String tag_string_req = "jsonobj_req";
     Double iprice;
+    int count=0;
     public static String method="",intentprodname="",intentweight;
-    public static String rcvd_amt="0.0";
-    public static double tot=0.0,fprice=0.0,rest=0.0,oldprice=0.0;
-    public static boolean rcvIntentP=false,rcvIntentW=false,editFlag=false,subEditFlag=false,newCustomer=false;
+    public static String rcvd_amt="0.0",crdt_amt="0.0";
+    public static double tot=0.0,fprice=0.0,rest=0.0,oldprice=0.0,prevblnc=0.0,rec_rest_tot=0.0;
+    public static boolean rcvIntentP=false,rcvIntentW=false,editFlag=false,subEditFlag=false,equalFlag=false,newCustomer=false;
 
     private static final int CAMERA_CAPTURE_CODE = 501;
 
@@ -139,7 +147,7 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
     String GetImageNameFromEditText;
     String ImageNameFieldOnServer = "image_name" ;
     String ImagePathFieldOnServer = "image_path" ;
-    String ImageUploadPathOnSever ="http://www.thinkbank.co.in/Rajeshahi_app/capture_img_upload_to_server.php" ;
+    String ImageUploadPathOnSever ="http://www.thinkbank.co.in/Rajeshahi_app_testing/capture_img_upload_to_server.php" ;
     String tag_string_req2 = "string_req";
     private Uri mCameraFileUri;
 
@@ -156,15 +164,19 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
 
         sPrefUserInfo=new SPrefUserInfo(PlaceOrderActivity.this);
 
+        dec = new DecimalFormat(".##");
+
         ll_cash=(LinearLayout)findViewById(R.id.ll_cash);
         ll_cheque=(LinearLayout)findViewById(R.id.ll_cheque);
         ll_dd=(LinearLayout)findViewById(R.id.ll_dd);
+        ll_credit=(LinearLayout)findViewById(R.id.ll_credit);
         ll_radio_parent=(LinearLayout)findViewById(R.id.ll_radio_parent);
         ll_image=(LinearLayout)findViewById(R.id.ll_image);
 
         cash_amt=(EditText)findViewById(R.id.et_cash_rcvd_amt);
         cheque_amt=(EditText)findViewById(R.id.et_chq_rcvd_amt);
         dd_amt=(EditText)findViewById(R.id.et_dd_rcvd_amt);
+        credit_amt=(EditText)findViewById(R.id.et_credit_rcvd_amt);
         cheque_no=(EditText)findViewById(R.id.et_chq_no);
         dd_no=(EditText)findViewById(R.id.et_dd_no);
 
@@ -178,13 +190,12 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
 
         populateClntList();
 
-
-
         qty=(EditText)findViewById(R.id.et_qty);
 
         cash=(RadioButton)findViewById(R.id.rb_cash);
         cheque=(RadioButton)findViewById(R.id.rb_chq);
         dd=(RadioButton)findViewById(R.id.rb_dd);
+        credit=(RadioButton)findViewById(R.id.rb_credit) ;
 
         product=(MaterialSpinner) findViewById(R.id.sp_prod);
         weight=(MaterialSpinner) findViewById(R.id.sp_weight);
@@ -193,6 +204,7 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
         price=(TextView)findViewById(R.id.tv_price);
         total=(TextView)findViewById(R.id.tv_tot_amt);
         restamt=(TextView)findViewById(R.id.tv_rest_amt);
+        prevbal=(TextView)findViewById(R.id.tv_prev_bal);
 
         plus=(FloatingActionButton)findViewById(R.id.fab_plus);
         minus=(FloatingActionButton)findViewById(R.id.fab_minus);
@@ -223,6 +235,7 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
         cash.setOnClickListener(this);
         cheque.setOnClickListener(this);
         dd.setOnClickListener(this);
+        credit.setOnClickListener(this);
 
         CaptureImageFromCamera.setOnClickListener(this);
         chooseImageFromGallery.setOnClickListener(this);
@@ -234,10 +247,16 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
         qty.addTextChangedListener(this);
         cash_amt.addTextChangedListener(this);
         cheque_amt.addTextChangedListener(this);
+        credit_amt.addTextChangedListener(this);
         dd_amt.addTextChangedListener(this);
         total.addTextChangedListener(this);
+        bag.addTextChangedListener(this);
 
         clnt_name.setOnFocusChangeListener(this);
+        cash_amt.setOnFocusChangeListener(this);
+        cheque_amt.setOnFocusChangeListener(this);
+        dd_amt.setOnFocusChangeListener(this);
+        restamt.addTextChangedListener(this);
 
 
      //   dialog = new SpotsDialog(this,R.style.Custom);
@@ -278,6 +297,7 @@ public class PlaceOrderActivity extends AppCompatActivity implements AdapterView
         cash.setEnabled(false);
         cheque.setEnabled(false);
         dd.setEnabled(false);
+        credit.setEnabled(false);
         CaptureImageFromCamera.setEnabled(true);
         rcvd_amt="0.0";
       //  Toast.makeText(this,"oncreate"+rcvd_amt,Toast.LENGTH_SHORT).show();
@@ -311,6 +331,7 @@ if(intent.getExtras()!=null) {
 
    // Toast.makeText(getApplicationContext(),"Edit inside",Toast.LENGTH_SHORT).show();
     editFlag=true;
+    credit.setEnabled(false);
 
     ll_image.setVisibility(View.GONE);
 //    ImageViewHolder.setVisibility(View.GONE);
@@ -326,25 +347,48 @@ if(intent.getExtras()!=null) {
 
 
         ord_no.setText(intent.getStringExtra("ord"));
+        count= Integer.parseInt(intent.getStringExtra("count"));
         bag.setText(intent.getStringExtra("count"));
         clnt_name.append(intent.getStringExtra("cust"));
-        total.setText("Tot.Amt." + intent.getStringExtra("tot"));
+        total.setText("Total Amt. " + intent.getStringExtra("tot"));
        // restamt.setText("Rest Amt."+intent.getStringExtra("rest"));
         tot= Double.parseDouble(intent.getStringExtra("tot"));
-        Log.e("tot",String.valueOf(tot));
+        Log.e("tot from intent",String.valueOf(tot));
         String intentmethod = intent.getStringExtra("method");
         method=intent.getStringExtra("method");
         rcvd_amt=intent.getStringExtra("rcvd");
-        String c = "cash", ch = "cheque", d = "dd";
+        Log.e("rcvd intent",rcvd_amt);
+        rec_rest_tot=Double.parseDouble(intent.getStringExtra("rest"));
+        Log.e("rec_rest_tot intent",""+rec_rest_tot);
+        crdt_amt=intent.getStringExtra("crdt");
+        Log.e("crdt intent",crdt_amt);
+        String c = "cash", ch = "cheque", d = "dd",cr="credit";
+        Log.e("method",intentmethod);
         if (intentmethod.equals(c)) {
 
             cash.setChecked(true);
             cash.setSelected(true);
+            cash.setEnabled(true);
             cash_amt.setEnabled(true);
-            cash_amt.setText(intent.getStringExtra("rcvd"));
+            restamt.setText("Total Amt to be paid: "+rec_rest_tot);
+          //  cash_amt.setText(intent.getStringExtra("rcvd"));
+           // credit.setEnabled(true);
 
-        } else if (intentmethod.equals(ch)) {
+        }
 
+      else if(intentmethod.equals(cr))
+        {
+            credit.setChecked(true);
+            credit.setSelected(true);
+          //  credit.setEnabled(true);
+            credit_amt.setEnabled(true);
+            credit_amt.setText(crdt_amt);
+            credit_amt.setEnabled(false);
+            cash.setEnabled(true);
+        }
+        else if (intentmethod.equals(ch)) {
+
+            Log.e("Cheque No",intent.getStringExtra("cheque"));
             cheque.setChecked(true);
             cheque.setSelected(true);
             cheque_amt.setEnabled(true);
@@ -353,6 +397,7 @@ if(intent.getExtras()!=null) {
             cheque_no.setText(intent.getStringExtra("cheque"));
         } else if (intentmethod.equals(d)) {
 
+            Log.e("dd No",intent.getStringExtra("dd"));
             dd.setChecked(true);
             dd.setSelected(true);
             dd_amt.setEnabled(true);
@@ -362,7 +407,7 @@ if(intent.getExtras()!=null) {
         }
 
         populateProdSpinner();
-        minus.setEnabled(false);
+       // minus.setEnabled(false);
     }
     /*
     * Sub Edit
@@ -378,11 +423,11 @@ if(intent.getExtras()!=null) {
         bag.setText("1");
         intentprodname=intent.getStringExtra("p");
         intentweight=intent.getStringExtra("w");
-
+        rec_rest_tot=Double.parseDouble(intent.getStringExtra("rest"));
         Log.e("inptentprodname",intentprodname);
         Log.e("intentweightname",intentweight);
          qty.setText(intent.getStringExtra("q"));
-         price.setText("Price :"+intent.getStringExtra("pr"));
+         price.setText("Price:"+intent.getStringExtra("pr"));
         oldprice=Double.parseDouble(intent.getStringExtra("pr"));
         ord_no.setText(intent.getStringExtra("ord"));
         clnt_name.setText(intent.getStringExtra("cust"));
@@ -390,8 +435,10 @@ if(intent.getExtras()!=null) {
 //         disableAll();
         CaptureImageFromCamera.setEnabled(false);
        ImageViewHolder.setEnabled(false);
-        total.setText("Tot.Amt." + intent.getStringExtra("tot"));
+        total.setText("Total Amt." + intent.getStringExtra("tot"));
         tot=Double.parseDouble(intent.getStringExtra("tot"))-Double.parseDouble(intent.getStringExtra("pr"));
+        Log.e("price in sub intent",intent.getStringExtra("pr"));
+        Log.e("tot in sub intent",""+tot);
     }
 }
 /*
@@ -410,6 +457,30 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
 
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.e("onResume","called");
+        Log.e("rest in onResume",""+rest);
+       // checkPrevBal();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e("Inside","onDestroy");
+    }
+
+    @Override
+    protected void onStop() {
+        rest=0.0;
+        editFlag=subEditFlag=false;
+        oldprice=0.0;
+        super.onStop();
+        Log.e("Inside","onStop");
+        rest=0.0;
+    }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
@@ -476,14 +547,16 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                                 // Toast.makeText(this,"Changed to cash",Toast.LENGTH_SHORT).show();
                                 cheque.setChecked(false);
                                 dd.setChecked(false);
-
+                                credit.setChecked(false);
                                 cash_amt.setEnabled(true);
 
                                 dd_amt.setText("");
                                 dd_no.setText("");
                                 cheque_amt.setText("");
                                 cheque_no.setText("");
+                                credit_amt.setText("");
                                 cheque_amt.setEnabled(false);
+                                credit_amt.setEnabled(false);
                                 cheque_no.setEnabled(false);
                                 dd_amt.setEnabled(false);
                                 dd_no.setEnabled(false);
@@ -492,11 +565,32 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                                 ll_cash.setBackgroundColor(Color.parseColor("#FFF176"));
                                 ll_cheque.setBackgroundColor(Color.parseColor("#BBDEFB"));
                                 ll_dd.setBackgroundColor(Color.parseColor("#BBDEFB"));
+                                ll_credit.setBackgroundColor(Color.parseColor("#BBDEFB"));
 
                                 ll_radio_parent.setBackgroundColor(Color.parseColor("#FFF176"));
-                                restamt.setText("Tot Amt to be paid"+String.format("%.02f", tot));
+                                if(editFlag==true)
+                                    restamt.setText("Tot Amt to be paid: "+String.format("%.02f", rec_rest_tot));
+                                else
+                            restamt.setText("Tot Amt to be paid: "+String.format("%.02f", tot));
+                             // restamt.setText("Tot Amt to be paid: "+String.format("%.02f", rest));
+              //  restamt.setText("Tot Amt to be paid: "+String.format("%.02f", tot+prevblnc));
 
-                                break;
+                            /* if(!credit_amt.getText().toString().equals("")&&cash_amt.getText().toString().equals("")) {
+                             Log.e("Inside rb_cash","first if");
+                                 Log.e("Inside rb_cash rest",""+rest);
+                                 cash_amt.setText(String.valueOf(rest));
+                             }
+
+
+                                if(!cash_amt.getText().toString().equals("") &&!credit_amt.getText().toString().equals("")) {
+                                    if (rest != 0) {
+                                        Toast.makeText(PlaceOrderActivity.this, "Enter correct amounts", Toast.LENGTH_SHORT).show();
+                                       // credit_amt.setText("");
+                                    }
+
+                                }*/
+                            crdt_amt="0.0";
+                    break;
 
             case R.id.rb_chq:   method="cheque";
                                // Toast.makeText(this,"Changed to chq",Toast.LENGTH_SHORT).show();
@@ -518,7 +612,7 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                                 ll_dd.setBackgroundColor(Color.parseColor("#BBDEFB"));
 
                                 ll_radio_parent.setBackgroundColor(Color.parseColor("#FFF176"));
-                                restamt.setText("Tot Amt to be paid"+String.format("%.02f", tot));
+                                restamt.setText("Tot Amt to be paid: "+String.format("%.02f", tot));
                                 break;
 
             case R.id.rb_dd:    method="dd";
@@ -543,8 +637,49 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                                 ll_dd.setBackgroundColor(Color.parseColor("#FFF176"));
 
                                 ll_radio_parent.setBackgroundColor(Color.parseColor("#FFF176"));
-                                restamt.setText("Tot Amt to be paid"+String.format("%.02f", tot));
+                                restamt.setText("Tot Amt to be paid: "+String.format("%.02f", tot));
                                 break;
+
+
+            case R.id.rb_credit:  method="credit";
+                // Toast.makeText(this,"Changed to cash",Toast.LENGTH_SHORT).show();
+                cash.setChecked(false);
+                cash_amt.setText("");
+               cash_amt.setEnabled(false);
+
+
+                ll_credit.setBackgroundColor(Color.parseColor("#FFF176"));
+                ll_cash.setBackgroundColor(Color.parseColor("#BBDEFB"));
+                ll_radio_parent.setBackgroundColor(Color.parseColor("#FFF176"));
+
+               // restamt.setText("Tot Amt to be paid"+String.format("%.02f", tot));
+              /*  if(!cash_amt.getText().toString().equals("")&&credit_amt.getText().toString().equals(""))
+                  //  credit_amt.setText(String.valueOf(rest));
+
+                 if(!cash_amt.getText().toString().equals("") &&!credit_amt.getText().toString().equals("")) {
+                    if (rest!=0)
+                        Toast.makeText(PlaceOrderActivity.this, "Enter correct amounts", Toast.LENGTH_SHORT).show();
+                    credit_amt.setText("");
+
+                }*/
+
+                credit_amt.setEnabled(true);
+                rcvd_amt="0.0";
+              if(editFlag==false) {
+                  restamt.setText("Tot Amt to be paid: " + String.format("%.02f", tot));
+                  credit_amt.setText(String.valueOf(tot));
+                  credit_amt.setEnabled(false);
+              }if(editFlag==true)
+              {
+                  if(credit_amt.getText().toString().equals(""))
+                  {
+                      credit_amt.setText(String.valueOf(rec_rest_tot));
+                      credit_amt.setEnabled(false);
+                  }
+
+              }
+                break;
+
 
             /*
             *  adding suborder in object
@@ -581,17 +716,21 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                 cash.setEnabled(true);
                 cheque.setEnabled(true);
                 dd.setEnabled(true);
+                credit.setEnabled(true);
                 clear();
-                int pluss = Integer.parseInt(bag.getText().toString()) + 1;
-                bag.setText(String.valueOf(pluss));
+               // int pluss = Integer.parseInt(bag.getText().toString()) + 1;
+             //   if(subEditFlag==false)
+               // bag.setText(String.valueOf(pluss));
                 // Toast.makeText(this,"fprice;"+String.valueOf(fprice),Toast.LENGTH_SHORT).show();
                 Log.e("fprice", String.valueOf(fprice));
                 Log.e("tot", String.valueOf(tot));
 
                 tot = tot + fprice;
+                if(editFlag==true )
+                    rec_rest_tot=rec_rest_tot+fprice;
                 Log.e("tot", String.valueOf(tot));
                 //tot=tot+Double.parseDouble(price.getText().toString());
-                total.setText("Total Amt:" + String.valueOf(tot));
+                total.setText("Total Amt: " + String.valueOf(tot));
             }
                                 break;
 
@@ -625,16 +764,30 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                // Toast.makeText(getApplicationContext(),String.valueOf(popupWindow.getAnimationStyle()), Toast.LENGTH_SHORT).show();
             }
             else {
-                obj.remove(bag.getText().toString());
+                //obj.remove(bag.getText().toString());
                 int minuss = Integer.parseInt(bag.getText().toString()) - 1;
                 clear();
+                Log.e("tot before removal", String.valueOf(tot));
+                Log.e("minuss", String.valueOf(minuss));
                 if (minuss >= 0) {
-                    bag.setText(String.valueOf(minuss));
-                    tot = tot - fprice;
-                }
+                    Log.e("Inside if", "minus");
+                    //bag.setText(String.valueOf(minuss));
+                   // tot = tot - fprice; old
+                    try {
 
+                        Log.e("price to be removed", obj.getJSONObject(bag.getText().toString()).getString("v6"));
+                        if(editFlag==true)
+                            rec_rest_tot=rec_rest_tot-Double.parseDouble(obj.getJSONObject(bag.getText().toString()).getString("v6"));
+                        tot=tot-Double.parseDouble(obj.getJSONObject(bag.getText().toString()).getString("v6"));
+                        obj.remove(bag.getText().toString());
+                        bag.setText(String.valueOf(minuss));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+               // Log.e("tot after removal", String.valueOf(tot));
                 //tot=tot+Double.parseDouble(price.getText().toString());
-                total.setText("Total Amt:" + String.valueOf(tot));
+                total.setText("Total Amt: " + String.valueOf(tot));
                 Log.e("Removed ", String.valueOf(minuss));
             }
                                     break;
@@ -751,14 +904,12 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                     startActivity(intent);
                 }
                 else {
-
-
                     if (clnt_name.getText().toString().equals("") ||
                             product.getSelectedItemPosition() == 0 ||
                             weight.getSelectedItemPosition() == 0 ||
                             qty.getText().toString().equals("")
                             ) {
-                        Log.e("Empy", "empty");
+                        Log.e("Empty", "empty");
                         dialog_result.setText("please fill all fields! ");
                         verify.setText("OK");
 
@@ -785,22 +936,37 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                         if (subEditFlag == true) {
                             int plussd = Integer.parseInt(bag.getText().toString()) + 1;
                             bag.setText("1");
-                            Log.e("Editflag", "true");
+                            Log.e("SubEditflag y4", "true");
                             Log.e("tot", String.valueOf(tot));
-                            Log.e("tot", String.valueOf(fprice));
+                            Log.e("fprice", String.valueOf(fprice));
                             tot = tot + fprice;
+                            rec_rest_tot=rec_rest_tot+fprice;
                             total.setText("Tot.Amt." + tot);
                             putSuborder();
                             cash.setEnabled(true);
                             cheque.setEnabled(true);
                             dd.setEnabled(true);
-                            rest = tot - Double.parseDouble(rcvd_amt);
-                            Log.e("rcvd", String.valueOf(Double.parseDouble(rcvd_amt)));
-                            Log.e("tot", String.valueOf(tot));
-                            Log.e("rest", String.valueOf(rest));
+                            credit.setEnabled(true);
+                           /* if(crdt_amt.equals("0.0")) {
+                                Log.e("yes4","rcvd");
+                                rest = tot - Double.parseDouble(rcvd_amt);
+                            }
+                            else if(!crdt_amt.equals("0.0")) {
+                                Log.e("yes4","crdt");
+                                rest = 0.0;
+                                                            }*/
+                           // rest = prevblnc+(tot - Double.parseDouble(rcvd_amt));
+                           // rest = tot - Double.parseDouble(rcvd_amt);
+
+                            rest=rec_rest_tot-Double.parseDouble(rcvd_amt);
+                           /* Log.e("crdt yes4", String.valueOf(Double.parseDouble(crdt_amt)));
+                            Log.e("rcvd y4", String.valueOf(Double.parseDouble(rcvd_amt)));
+                            Log.e("tot y4", String.valueOf(tot));
+                            Log.e("rec_rest_tot y4", String.valueOf(tot));
+                            Log.e("rest y4", String.valueOf(rest));*/
                             if (rest < 0) {
                                 rest = tot;
-                                restamt.setText(String.valueOf("Amt to be paid: " + String.format("%.02f", rest)));
+                                restamt.setText("Yes Amt to be paid: " + String.format("%.02f", rest));
                                 // Toast.makeText(this, "Amount exceeded!", Toast.LENGTH_SHORT).show();
                                 dialog_result.setText("Amount exceeded!");
                                 verify.setText("OK");
@@ -813,14 +979,14 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                                 // popupWindow.setElevation(20.5f);
                                 //Toast.makeText(getApplicationContext(),"Elevation:"+String.valueOf(popupWindow.getElevation()), Toast.LENGTH_SHORT).show();
                                 popupWindow.setOutsideTouchable(false);
-                                if (popupWindow.isShowing()) {
+                                if (popupWindow.isShowing())
                                     popupWindow.dismiss();
-                                }
-                                popupWindow.showAtLocation(getCurrentFocus(), Gravity.CENTER, 0, 0);
+
+                                 popupWindow.showAtLocation(getCurrentFocus(), Gravity.CENTER, 0, 0);
                             } else if (rest == 0)
-                                restamt.setText("All paid!");
+                                restamt.setText("yes2 All paid!");
                             else
-                                restamt.setText(String.valueOf("Amt to be paid: " + String.format("%.02f", rest)));
+                                restamt.setText("yes2 Amt to be paid: " + String.format("%.02f", rest));
                             //subEditFlag=false;
                         } else {
 
@@ -828,22 +994,37 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                             cash.setEnabled(true);
                             cheque.setEnabled(true);
                             dd.setEnabled(true);
+                            credit.setEnabled(true);
                             int plussdn = Integer.parseInt(bag.getText().toString()) + 1;
                             Log.e("subeditflag", String.valueOf(subEditFlag));
-                            bag.setText(String.valueOf(plussdn));
+                           // bag.setText(String.valueOf(plussdn));
                             Log.e("fprice", String.valueOf(fprice));
                             Log.e("tot", String.valueOf(tot));
+                            Log.e("oldprice", String.valueOf(oldprice));
                             tot=tot-oldprice;
                             tot = tot + fprice;
-                            total.setText("Total Amt:" + String.valueOf(tot));
-                            // Toast.makeText(this,"done"+rcvd_amt,Toast.LENGTH_SHORT).show();
-                            rest = tot - Double.parseDouble(rcvd_amt);
+                            if(editFlag==true) {
+                                rec_rest_tot = rec_rest_tot + fprice;
+                                rest=rec_rest_tot-Double.parseDouble(rcvd_amt);
+                            }
+                            else
+                                rest = tot - Double.parseDouble(rcvd_amt);
+                            total.setText("Total Amt: " + String.valueOf(tot));
+
+                            /*if(crdt_amt.equals("0.0")) {
+                               // rest = prevblnc+(tot - Double.parseDouble(rcvd_amt));
+                                rest = tot - Double.parseDouble(rcvd_amt);
+                            }
+                            else if(!crdt_amt.equals("0.0"))
+                            {
+                                rest=0.0;
+                            }*/
                             Log.e("rcvd", String.valueOf(Double.parseDouble(rcvd_amt)));
                             Log.e("tot", String.valueOf(tot));
                             Log.e("rest", String.valueOf(rest));
                             if (rest < 0) {
-                                rest = tot;
-                                restamt.setText(String.valueOf("Amt to be paid: " + String.format("%.02f", rest)));
+                                rest = rest+tot;
+                                restamt.setText("Amt to be paid: " + String.format("%.02f", rest));
                                 //  Toast.makeText(this, "Amount exceeded!", Toast.LENGTH_SHORT).show();
                                 dialog_result.setText("Amount exceeded!");
                                 verify.setText("OK");
@@ -861,9 +1042,9 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                                 }
                                 popupWindow.showAtLocation(getCurrentFocus(), Gravity.CENTER, 0, 0);
                             } else if (rest == 0)
-                                restamt.setText("All paid!");
+                                restamt.setText("yes4 All paid!");
                             else
-                                restamt.setText(String.valueOf("Amt to be paid: " + String.format("%.02f", rest)));
+                                restamt.setText("yes4 Amt to be paid: " + String.format("%.02f", rest));
                         }
 
                         clear();
@@ -946,9 +1127,13 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                                     payObject.put("rcvd_amt",rcvd_amt);
                                     payObject.put("chequeno",cheque_no.getText().toString());
                                     payObject.put("ddno",dd_no.getText().toString());
+                                    payObject.put("credit",crdt_amt);
                                     payObject.put("cust",clnt_name.getText().toString());
                                     payObject.put("user",/*SplashActivity.*/sPrefUserInfo.getUserInfo());
-
+                                    if(editFlag==true)
+                                        payObject.put("rest",String.valueOf(rec_rest_tot-Double.parseDouble(rcvd_amt)));
+                                    else
+                                        payObject.put("rest",String.valueOf(tot-Double.parseDouble(rcvd_amt)));
                                     Log.e("Json",payObject.toString());
 
                                     Log.e("editFlag",""+editFlag);
@@ -970,6 +1155,8 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
                                             || dialog_result.getText().toString().equals("Order Updated!"))
                                     {
                                         Log.e("Text","yes");
+                                        editFlag=subEditFlag=false;
+                                        oldprice=0.0;
                                         finish();
                                     }
                                    UploadImageToServer.setEnabled(true);
@@ -984,6 +1171,11 @@ Log.e("SubEditFlag", String.valueOf(subEditFlag));
 
             case R.id.btn_Capture:
 
+               /* String s="";
+                cash_amt.setFocusable(false);
+                if(!cash_amt.getText().toString().equals(""))
+                   s =String.format("%.02f", Float.parseFloat(cash_amt.getText().toString()));
+                    cash_amt.append(s);*/
                 progressDialog.show();
                 if (ContextCompat.checkSelfPermission
                         (this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
@@ -1145,9 +1337,11 @@ Log.e("Inside","putsuborder");
 
               }*/
             Iterator<String> keys = obj.keys();
+            String keyin="";
             while(keys.hasNext() ) {
-                String keyin = (String)keys.next();
+                 keyin = (String)keys.next();
                 if ( obj.get(keyin) instanceof JSONObject ) {
+                    Log.e("putsuborder","first if");
                     JSONObject xx = new JSONObject(obj.get(keyin).toString());
 
                     Log.e("v3",xx.get("v3").toString());
@@ -1157,7 +1351,9 @@ Log.e("Inside","putsuborder");
                     if(xx.getString("v3").equals(product.getSelectedItem().toString()))
                     {
                         if(xx.getString("v4").equals(weight.getSelectedItem().toString())) {
+                            Log.e("putsuborder","inner if");
                             Log.e("equal", "equal");
+                            equalFlag=true;
                             //  int newq= Integer.parseInt(obj.getString("v5"));
                             // Log.e("nq", obj.getString("v5"));
 
@@ -1177,11 +1373,14 @@ Log.e("Inside","putsuborder");
                             Log.e("obj size", String.valueOf(obj.length()));
                             break;
                         }
-                    }
+                        else
+                        {
+                            Log.e("putsuborder","inner else");
 
+                        }
+                    }
                 }
             }
-
 
                 Log.e("Yes", "no");
                 JSONObject suborder = new JSONObject();
@@ -1192,14 +1391,24 @@ Log.e("Inside","putsuborder");
                 suborder.put("v5", String.valueOf(q));
                 suborder.put("v6", String.valueOf(p));
 
-                int ono = Integer.parseInt(bag.getText().toString()) + 1;
+                int ono=0;
+                if(equalFlag==false && subEditFlag==false)
+               ono = Integer.parseInt(bag.getText().toString()) + 1;
+                else if(!keyin.equals(""))
+                    ono= Integer.parseInt(keyin);
+            Log.e("ono",""+ono);
                 //Log.e("ordersuborder",String.valueOf(suborder));
+
                 obj.put(String.valueOf(ono), suborder);
+
                 //Log.e("orderobj",String.valueOf(obj));
                 suborderMap.put(String.valueOf(ono), suborder);
                 //  Log.e("orderSubordermapzize", String.valueOf(suborderMap.size()));
-
-
+            Log.e("equalFlag",""+equalFlag);
+            if(equalFlag==false && subEditFlag==false)
+            bag.setText(String.valueOf(ono));
+            else
+                equalFlag=false;
 
 
 
@@ -1221,7 +1430,7 @@ Log.e("Inside","putsuborder");
 
 
         Log.e("populateProdSpinner","called");
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/fetchProdSpin.php";
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchProdSpin.php";
        // String url = "http://www.thinkbank.co.in/Rajeshahi_app_testingfetchProdSpin.php";
 
 
@@ -1296,7 +1505,7 @@ Log.e("Inside","putsuborder");
             e.printStackTrace();
         }
 
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/fetchWghtSpin.php?p_name="+prod;
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchWghtSpin.php?p_name="+prod;
         //String url = "http://www.thinkbank.co.in/Rajeshahi_app_testingfetchWghtSpin.php?p_name="+prod;
         Log.e("URL",url);
 
@@ -1426,9 +1635,39 @@ Log.e("Inside","putsuborder");
             if(!cash_amt.getText().toString().equals(""))
             {
                Log.e("tot at cash",String.valueOf(tot));
+                //cash_amt.setText(String.format("%.02f",Float.parseFloat(cash_amt.getText().toString())));
+                String s=cash_amt.getText().toString();
+               if(cash_amt.getText().toString().contains("."))
+               {
+                   int length=cash_amt.getText().toString().substring(cash_amt.getText().toString().indexOf(".")).length();
+                   if(length>3) {
+                        cash_amt.setText("");
+                       cash_amt.append(s.substring(0, s.length() - 1));
+                       Log.e("String length", "" + length);
+                       //cash_amt.setText(String.format("%.02f",Float.parseFloat(cash_amt.getText().toString())));
+                   }
+               }
 
                 rcvd_amt=String.format("%.02f",Float.parseFloat(cash_amt.getText().toString()));
-                rest = tot - Double.parseDouble(rcvd_amt);
+                Log.e("rcvd amt in cash textc",rcvd_amt);
+               /* if(!crdt_amt.equals("")) {
+                    Log.e("Inside"," cash if");
+                    Log.e("crdt",crdt_amt);
+                    rest = tot - (Double.parseDouble(rcvd_amt) + Double.parseDouble(crdt_amt));
+                }
+                else {
+                    Log.e("Inside","cash else");*/
+               Log.e("rest in cashtext before",""+rest);
+                Log.e("tot in cashtext before",""+tot);
+                Log.e("prev balance",""+prevblnc);
+                  //  rest = (tot+prevblnc) - Double.parseDouble(rcvd_amt);
+                if(editFlag==true)
+                    rest=rec_rest_tot-Double.parseDouble(rcvd_amt);
+                else
+                    rest = tot - Double.parseDouble(rcvd_amt);
+              //  }
+
+                Log.e("In cash",""+tot+" "+rest);
                 if (rest < 0)
                 {
                     cash_amt.setText("");
@@ -1455,15 +1694,81 @@ Log.e("Inside","putsuborder");
                 else if (rest == 0)
                     restamt.setText("All paid!");
                 else
-                    restamt.setText(String.valueOf("total Amt to be paid: " + String.format("%.02f", rest)));
+                    restamt.setText("Total Amt to be paid: " + String.format("%.02f", rest));
             }
             else if(cash_amt.getText().toString().equals(""))
             {
-                restamt.setText(String.valueOf("total Amt to be paid: " + String.format("%.02f", tot)));
+                if(editFlag==true)
+                    restamt.setText("Total Amt to be paid: " + String.format("%.02f", rec_rest_tot));
+                else
+                    restamt.setText("Total Amt to be paid: " + String.format("%.02f", tot));
             }
 
         }
-              else if(cheque_amt.getText().hashCode()==editable.hashCode()){
+
+        else if(credit_amt.getText().hashCode()==editable.hashCode())
+        {
+            if(!credit_amt.getText().toString().equals(""))
+            {
+                Log.e("tot at cash",String.valueOf(tot));
+                //cash_amt.setText(String.format("%.02f",Float.parseFloat(cash_amt.getText().toString())));
+                //setMaximumFractionDigits(2)
+                String s=credit_amt.getText().toString();
+                if(credit_amt.getText().toString().contains("."))
+                {
+                    int length=credit_amt.getText().toString().substring(credit_amt.getText().toString().indexOf(".")).length();
+                    if(length>3) {
+                        credit_amt.setText("");
+                        credit_amt.append(s.substring(0, s.length() - 1));
+                        Log.e("String length", "" + length);
+                        //cash_amt.setText(String.format("%.02f",Float.parseFloat(cash_amt.getText().toString())));
+                    }
+                }
+//                rcvd_amt=String.format("%.02f",Float.parseFloat(cash_amt.getText().toString()));
+                crdt_amt=String.format("%.02f",Float.parseFloat(credit_amt.getText().toString()));
+                Log.e("crdt amt",crdt_amt);
+              /*  if(!cash_amt.equals(""))
+                    rest=tot-(Double.parseDouble(rcvd_amt)+Double.parseDouble(crdt_amt));
+                else*/
+               // rest = tot - Double.parseDouble(crdt_amt);
+                rest=0.0;
+                Log.e("rest",""+rest);
+                if (rest < 0)
+                {
+                    cash_amt.setText("");
+                    credit_amt.setText("");
+                    //  Toast.makeText(this, "Amount exceeded!", Toast.LENGTH_SHORT).show();
+                    dialog_result.setText("Amount exceeded!");
+                    verify.setText("OK");
+                    popupWindow = new PopupWindow(
+                            customView,
+                            LayoutParams.MATCH_PARENT,
+                            LayoutParams.MATCH_PARENT
+                    );
+                    //  popupWindow.setAnimationStyle(R.style.animationdialog);
+                    // popupWindow.setElevation(20.5f);
+                    //Toast.makeText(getApplicationContext(),"Elevation:"+String.valueOf(popupWindow.getElevation()), Toast.LENGTH_SHORT).show();
+                    popupWindow.setOutsideTouchable(false);
+                    if(popupWindow.isShowing())
+                    {
+                        popupWindow.dismiss();
+                    }
+                    if(editFlag==false && subEditFlag==false)
+                        popupWindow.showAtLocation(ll_radio_parent, Gravity.CENTER, 0, 0);
+                }
+                // restamt.setText("All Paid!" + "Extra Amt: " + String.valueOf(Math.abs(rest)));
+                else if (rest == 0)
+                    restamt.setText("All Settled!");
+                else
+                    restamt.setText("Total Amt to be paid: " + String.format("%.02f", rest));
+            }
+            else if(credit_amt.getText().toString().equals(""))
+            {
+               restamt.setText(String.valueOf("Total Amt to be paid: " + String.format("%.02f", tot)));
+            }
+
+        }
+              /*else if(cheque_amt.getText().hashCode()==editable.hashCode()){
 
             if(!cheque_amt.getText().toString().equals("")) {
                 rcvd_amt = String.format("%.02f", Float.parseFloat(cheque_amt.getText().toString()));
@@ -1535,19 +1840,36 @@ Log.e("Inside","putsuborder");
             {
                 restamt.setText(String.valueOf("total Amt to be paid: " + String.format("%.02f", tot)));
             }
-        }
+        }*/
         else if(total.getText().hashCode()==editable.hashCode())
         {
             Log.e("total textchanged","caled");
             Log.e("total text",total.getText().toString());
             if(total.getText().toString()!=null) {
+
                 Log.e("History check tot", String.valueOf(tot));
                 tot=Double.parseDouble(String.format("%.02f", tot));
+                Log.e("Rcvd Amt total textc",rcvd_amt);
+                if(editFlag==true)
+                    rest=rec_rest_tot;
+                else
+              //  rest = prevblnc +(tot - Double.parseDouble(rcvd_amt));
                 rest = tot - Double.parseDouble(rcvd_amt);
-                if (rest < 0)
+                if(credit.isChecked()) {
+                    Log.e("credit is checked","true");
+                    credit_amt.setEnabled(true);
+                    if(editFlag==true)
+                        credit_amt.setText(String.valueOf(rec_rest_tot));
+                    else
+                    credit_amt.setText(String.valueOf(tot));
+                    credit_amt.setEnabled(false);
+                    rest=0.0;
+                }
+               if (rest < 0)
                 {
                     rest=tot;
-                    restamt.setText(String.valueOf("total Amt to be paid: " + String.format("%.02f", String.format("%.02f", rest))));
+                   // restamt.setText(String.valueOf("total Amt to be paid: " + String.format("%.02f", String.format("%.02f", rest))));
+                    restamt.setText("Total Amt to be paid: " + String.format("%.02f", rest));
                    // Toast.makeText(this, "Amount exceeded!", Toast.LENGTH_SHORT).show();
                     dialog_result.setText("Amount exceeded!");
                     verify.setText("OK");
@@ -1568,11 +1890,34 @@ Log.e("Inside","putsuborder");
                 } else if (rest == 0)
                     restamt.setText("tot All paid!");
                 else
-                    restamt.setText(String.valueOf("total Amt to be paid: " + String.format("%.02f", rest)));
+                    restamt.setText(String.valueOf("Total Amt to be paid: " + String.format("%.02f", rest)));
             }
 
         }
 
+     else if(bag.getText().hashCode()==editable.hashCode())
+        {
+            if(editFlag==true)
+            {
+                Log.e("Count",""+count);
+                Log.e("Count of bag",""+bag.getText());
+                if(bag.getText().toString().equals(String.valueOf(count))) {
+                    Log.e("Count disabled minus",""+bag.getText());
+                    minus.setEnabled(false);
+                }
+                else
+                {
+                    Log.e("Count disabled minus",""+bag.getText());
+                    minus.setEnabled(true);
+                }
+            }
+        }
+
+        else if(restamt.getText().hashCode()==editable.hashCode())
+        {
+           /* rest=rest+prevblnc;
+            if(rest)*/
+        }
        /* else if(clnt_name.getText().hashCode()==editable.hashCode())
         {
             Log.e("Clnt aftertextchanged","caled");
@@ -1607,7 +1952,7 @@ Log.e("Inside","putsuborder");
         }
 
 
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/fetchProdPrice.php?p_name="+prod+"&&p_weight="+wt;
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchProdPrice.php?p_name="+prod+"&&p_weight="+wt;
       //  String url = "http://www.thinkbank.co.in/Rajeshahi_app_testingfetchProdPrice.php?p_name="+prod+"&&p_weight="+wt;
        // Log.e("URL",url);
 
@@ -1667,6 +2012,11 @@ Log.e("Inside","putsuborder");
             if(cash_amt.getText().toString().equals(""))
                 methodblank=true;
         }
+        if(method.equals("credit"))
+        {
+            if(credit_amt.getText().toString().equals(""))
+                methodblank=true;
+        }
         else if(method.equals("cheque"))
         {
             if ( cheque_amt.getText().toString().equals("") || cheque_no.getText().toString().equals(""))
@@ -1695,7 +2045,7 @@ Log.e("subeditflag", String.valueOf(subEditFlag));
 
 
         if (bag.getText().toString().equals("0")||
-                (cash.isChecked() == false && cheque.isChecked() == false && dd.isChecked() == false) ||
+                (cash.isChecked() == false && cheque.isChecked() == false && dd.isChecked() == false &&credit.isChecked()==false) ||
                                       methodblank==true ||
                 (editFlag==false && subEditFlag==false && bitmap==null)
                 ){
@@ -1742,10 +2092,10 @@ Log.e("subeditflag", String.valueOf(subEditFlag));
            // Toast.makeText(getApplicationContext(), "Editflag " + String.valueOf(editFlag) + " subEditFlag: "
             //        + String.valueOf(subEditFlag), Toast.LENGTH_SHORT).show();
             if (editFlag == true)
-                url = "http://www.thinkbank.co.in/Rajeshahi_app/updateAllData.php";
+                url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/updateAllData.php";
            // url = "http://www.thinkbank.co.in/Rajeshahi_app_testingupdateAllData.php";
             else
-                url = "http://www.thinkbank.co.in/Rajeshahi_app/postAllData.php";                
+                url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/postAllData.php";                
               //  url = "http://www.thinkbank.co.in/Rajeshahi_app_testingpostAllData.php";
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     url,
@@ -1826,10 +2176,15 @@ Log.e("subeditflag", String.valueOf(subEditFlag));
                     params.put("suborders", String.valueOf(obj));
                     params.put("order_main", String.valueOf(payObject));
                     params.put(ImagePathFieldOnServer, ConvertImage);
+                    if(subEditFlag==true)
+                    params.put("flag","sub");
+                    else if(editFlag==true)
+                        params.put("flag","main");
 
                     Log.e("ordersub", String.valueOf(obj));
                     Log.e("ordermain", String.valueOf(payObject));
                     Log.e("imagepath",ConvertImage);
+                    Log.e("ordflag"," "+editFlag+" "+subEditFlag);
                     return params;
                 }
             };
@@ -1846,7 +2201,7 @@ Log.e("subeditflag", String.valueOf(subEditFlag));
         progressDialog.setMessage("Please wait");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/capture_img_upload_to_server.php";
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/capture_img_upload_to_server.php";
        // String url = "http://www.thinkbank.co.in/Rajeshahi_app_testingcapture_img_upload_to_server.php";
 
         ByteArrayOutputStream byteArrayOutputStreamObject ;
@@ -2199,7 +2554,7 @@ Log.e("subeditflag", String.valueOf(subEditFlag));
 
 
         Log.e("populateProdSpinner","called");
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/fetchClientList.php";
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchClientList.php";
 
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -2287,6 +2642,7 @@ Log.e("subeditflag", String.valueOf(subEditFlag));
         plus.setEnabled(true);
         minus.setEnabled(true);
         cash.setEnabled(true);
+        credit.setEnabled(true);
         cheque.setEnabled(true);
         dd.setEnabled(true);
         product.setEnabled(true);
@@ -2302,6 +2658,7 @@ Log.e("subeditflag", String.valueOf(subEditFlag));
         plus.setEnabled(false);
         minus.setEnabled(false);
         cash.setEnabled(false);
+        credit.setEnabled(false);
         cheque.setEnabled(false);
         dd.setEnabled(false);
         product.setEnabled(false);
@@ -2317,28 +2674,86 @@ Log.e("subeditflag", String.valueOf(subEditFlag));
 *  check if client is present or not
 * */
 
-        if(view.getId()==R.id.et_clnt_name && editFlag==false) {
-            if (!clnt_name.getText().toString().equals("")) {
-                if (!list_clnt.contains(clnt_name.getText().toString())) {
-                    dialog_result2.setText("Customer not present!");
-                    yes.setText("Add Customer");
-                    no.setText("Cancel");
-                    popupWindow2 = new PopupWindow(
-                            customView2,
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
-                    );
+        if(view.getId()==R.id.et_clnt_name ) {
+           /* if(!clnt_name.getText().toString().equals(""))
+                checkPrevBal(clnt_name.getText().toString());
+*/
+            if (editFlag == false) {
+                if (!clnt_name.getText().toString().equals("")) {
+                    if (!list_clnt.contains(clnt_name.getText().toString())) {
+                        dialog_result2.setText("Customer not present!");
+                        yes.setText("Add Customer");
+                        no.setText("Cancel");
+                        popupWindow2 = new PopupWindow(
+                                customView2,
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT
+                        );
 
-                    popupWindow2.setOutsideTouchable(true);
-                    popupWindow2.showAtLocation(total, Gravity.CENTER, 0, 0);
+                        popupWindow2.setOutsideTouchable(true);
+                        popupWindow2.showAtLocation(total, Gravity.CENTER, 0, 0);
 
-                    newCustomer=true;
+                        newCustomer = true;
 
+                    }
                 }
             }
         }
          //  Toast.makeText(this,"changed",Toast.LENGTH_SHORT).show();
         Log.e("SubEditFlag", String.valueOf(subEditFlag));
+
+
+   /*     if(view.getId()==R.id.et_cash_rcvd_amt)
+        {
+            Log.e("Focus lost","cash rcvd amt");
+            if(!cash_amt.getText().toString().equals(""))
+            cash_amt.setText(String.format("%.02f", cash_amt.getText().toString()));
+        }*/
+
+    }
+
+    public void checkPrevBal(String clnt){
+
+        Log.e("Inside","checkPrevBal");
+        final ProgressDialog progressDialog=new ProgressDialog(PlaceOrderActivity.this);
+        progressDialog.setMessage("Please Wait");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+
+
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchPrevBal.php?c_id="+clnt;
+
+         Log.e("URL",url);
+
+        StringRequest strReq = new StringRequest(Request.Method.GET,
+                url, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+
+
+                Log.e("ResponsePrevBal", response.toString());
+                rest=rest-prevblnc;
+                prevblnc= Double.parseDouble(response);
+                Log.e("rest in prevbal",""+rest);
+                rest=rest+prevblnc;
+                restamt.setText("Amt to be paid: "+rest);
+                prevbal.setText("Previous balance: "+response);
+                progressDialog.dismiss();
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d("TAG", "Error: " + error.getMessage());
+                Log.e("ResponseError", error.toString());
+
+            }
+        }){
+
+        };
+
+        AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
 
     }
 }

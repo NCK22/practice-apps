@@ -1,26 +1,18 @@
 package com.innovation.neha.tracklocation.Adapters;
 
 import android.content.Context;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.innovation.neha.tracklocation.Pojos.Order;
-import com.innovation.neha.tracklocation.R;
-
-import android.view.LayoutInflater;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.innovation.neha.tracklocation.Pojos.Payment;
+import com.innovation.neha.tracklocation.Pojos.SubOrder;
+import com.innovation.neha.tracklocation.R;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -28,14 +20,14 @@ import java.util.List;
  * Created by Neha on 12-12-2017.
  */
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Viewholder>  {
+public class RecyclerViewPaymentAdapter extends RecyclerView.Adapter<RecyclerViewPaymentAdapter.Viewholder>  {
 
     Context context;
     private LayoutInflater mInflater;
-    private List<Order> mData = Collections.emptyList();
+    private List<Payment> mData = Collections.emptyList();
     private ItemClickListener mClickListener;
 
-    public RecyclerViewAdapter(Context context, List<Order> data){
+    public RecyclerViewPaymentAdapter(Context context, List<Payment> data){
 
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
@@ -45,24 +37,25 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
     @Override
-    public RecyclerViewAdapter.Viewholder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerViewPaymentAdapter.Viewholder onCreateViewHolder(ViewGroup parent, int viewType) {
 
        Log.e("Viewholder","Createviewholder");
-        View view = mInflater.inflate(R.layout.recyclerview_item_card, parent, false);
+        View view = mInflater.inflate(R.layout.recyclerview_paydetl_item_card, parent, false);
         view.setOnClickListener(mClickListener);
         final Viewholder viewholder = new Viewholder(view);
         return viewholder;
     }
 
     @Override
-    public void onBindViewHolder(RecyclerViewAdapter.Viewholder holder, int position) {
-        Log.e("Viewholder","bindviewholder");
-        final Order orderobj = mData.get(position);
-        holder.ord.setText(orderobj.getOrdNo());
-        holder.clnt.setText(orderobj.getClntName());
-        holder.tot.setText("Tot:"+String.valueOf(orderobj.getTot()));
-
-
+    public void onBindViewHolder(RecyclerViewPaymentAdapter.Viewholder holder, int position) {
+        Log.e("Viewholder","bindviewholder pay");
+        final Payment payobj = mData.get(position);
+        Log.e("Viewholder first value",payobj.getMethod());
+        holder.method.setText(payobj.getMethod());
+        holder.rcvd.setText(String.valueOf(payobj.getRcvd()));
+        holder.rest.setText(String.valueOf(payobj.getRest()));
+        String[] s=payobj.getDate().split(" ");
+        holder.date.setText(s[0]);
 
     }
 
@@ -82,33 +75,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     public class Viewholder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView ord, clnt, tot;
-        ImageButton edit, del;
-        Button det,pay_det;
+        TextView method, rcvd, rest,date;
 
 
         public Viewholder(View itemView) {
             super(itemView);
 
-            ord = (TextView) itemView.findViewById(R.id.tv_h_ord);
-            clnt = (TextView) itemView.findViewById(R.id.tv_h_name);
-            tot = (TextView) itemView.findViewById(R.id.tv_h_tot);
-            det=(Button)itemView.findViewById(R.id.btn_h_det);
-            pay_det=(Button)itemView.findViewById(R.id.btn_h_pay);
-            edit = (ImageButton) itemView.findViewById(R.id.btn_edit);
-            del = (ImageButton) itemView.findViewById(R.id.btn_del);
-
+            method = (TextView) itemView.findViewById(R.id.tv_pay_method);
+            rcvd = (TextView) itemView.findViewById(R.id.tv_pay_rcvd);
+            rest = (TextView) itemView.findViewById(R.id.tv_pay_rest);
+            date=(TextView)itemView.findViewById(R.id.tv_pay_date);
 
             itemView.setOnClickListener(this);
-            det.setOnClickListener(this);
-            pay_det.setOnClickListener(this);
-            edit.setOnClickListener(this);
-            del.setOnClickListener(this);
-
-
-
-
-
 
         }
 

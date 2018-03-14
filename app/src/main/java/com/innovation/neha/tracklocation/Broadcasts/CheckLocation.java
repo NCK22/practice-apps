@@ -38,20 +38,24 @@ public class CheckLocation extends BroadcastReceiver {
         Log.e("check location", "onreceive");
 
        intent =new Intent(context,FrontActivity.class);
+       intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
        intent.putExtra("flag","locoff");
 
         LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
         gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (!gps_enabled) {
+
+            Log.e("check location", "gps disabled");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
             context.startActivity(intent);
         }
 
         if (gps_enabled) {
+            Log.e("check location", "gps enabled");
             Intent intent1=new Intent(context, TrackLocService.class);
           //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startService(intent);
+            context.startService(intent1);
         }
 
            // isLocationEnabled();

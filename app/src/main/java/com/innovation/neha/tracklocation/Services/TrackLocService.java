@@ -69,6 +69,7 @@ public class TrackLocService extends Service implements
     LocationRequest mLocationRequest;
     Location mCurrentLocation;
     String mLastUpdateTime;
+    float difference=0.0f;
 
 
     private FusedLocationProviderClient mFusedLocationClient;
@@ -81,7 +82,7 @@ public class TrackLocService extends Service implements
     // Tag used to cancel the request
     String tag_string_req = "string_req";
 
-    String url = "http://www.thinkbank.co.in/Rajeshahi_app/SendLocation.php";
+    String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/SendLocation.php";
     public static String vid="",uid="",stime="";
     private SPrefUserInfo sPrefUserInfo;
     Context context,ctxperm;
@@ -256,6 +257,11 @@ public class TrackLocService extends Service implements
     public void onLocationChanged(Location location) {
 
         Log.e(TAG, "Firing onLocationChanged..............................................");
+
+        if(location!=null && mCurrentLocation!=null)
+        {
+            difference=location.getAccuracy()-mCurrentLocation.getAccuracy();
+        Log.e("difference", String.valueOf(location.getAccuracy()-mCurrentLocation.getAccuracy()));}
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
 
@@ -270,15 +276,16 @@ public class TrackLocService extends Service implements
        // if(FrontActivity.isVisitStarted==true) {
        /* if(FrontActivity.isVisitStarted==true)*/
 
-
-       if(sPrefUserInfo.getVisitInfo().equals("yes") && mCurrentLocation.getAccuracy()<=25){
-       Log.e("SLS",sPrefUserInfo.getUserInfo()+sPrefUserInfo.getVisitInfo());
+    if(difference>-2.0f && difference<2.0f) {
+        if (sPrefUserInfo.getVisitInfo().equals("yes") && mCurrentLocation.getAccuracy() <= 20) {
+            Log.e("SLS", sPrefUserInfo.getUserInfo() + sPrefUserInfo.getVisitInfo());
             if (!sPrefUserInfo.getUserInfo().equals("") && !sPrefUserInfo.getVisitInfo().equals(""))
                 sendLocationString();
         /*else if(FrontActivity.isVisitStarted==false)*/
             else if (sPrefUserInfo.getUserInfo().equals("") || sPrefUserInfo.getVisitInfo().equals(""))
                 stopLocationUpdates();
         }
+    }
        // getLocationString();
        //getLocatonObject();
       //  updateUI();
@@ -403,7 +410,7 @@ public class TrackLocService extends Service implements
 
     public void getLocatonObject(){
         Log.e("getLocationObject","called");
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/SendLocation.php?p_id=49";
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/SendLocation.php?p_id=49";
 
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -478,8 +485,6 @@ public class TrackLocService extends Service implements
                this.mGoogleApiClient.connect();
         Log.e("After googleapiclient", String.valueOf(mGoogleApiClient.isConnected()));
         return START_STICKY;
-
-
 
     }
 

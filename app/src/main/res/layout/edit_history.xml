@@ -3,16 +3,84 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#F9FBE7"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_margin="1dp"
+    android:weightSum="2"
+    android:background="@drawable/cardborder"
     tools:context="com.innovation.neha.tracklocation.Activities.HistoryActivity">
+
+    <LinearLayout
+        android:id="@+id/ll_title_pay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="4"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="3dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:visibility="invisible">
+        <TextView
+            android:id="@+id/tv_title_method"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.7"
+            android:text="Method"
+            android:gravity="center_horizontal"
+            android:textSize="15sp"
+            android:textColor="#EC407A"
+            android:layout_gravity="center_vertical"
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/tv_title_rcvd"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Rcvd Amt"
+            android:textSize="15sp"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center_vertical"
+            android:textStyle="bold"
+            android:textColor="#EC407A"/>
+        <TextView
+            android:id="@+id/tv_title_rest"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Rest Amt"
+            android:textSize="15sp"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center_vertical"
+            android:textStyle="bold"
+            android:textColor="#EC407A"/>
+        <TextView
+            android:id="@+id/tv_title_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.4"
+            android:text="Date"
+            android:textSize="15sp"
+            android:gravity="center_horizontal"
+           android:layout_gravity="center_vertical"
+            android:textStyle="bold"
+            android:textColor="#EC407A"/>
+
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_hist_detail"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-
-        android:background="#FFCCBC">
+        android:background="#FFCCBC"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp">
 
     </android.support.v7.widget.RecyclerView>
 

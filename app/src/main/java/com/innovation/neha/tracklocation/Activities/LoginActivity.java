@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         progressDialog.setMessage("Loading..");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/login.php?l_name="+name+"&&pass="+pwd;
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/login.php?l_name="+name+"&&pass="+pwd;
          Log.e("URL",url);
        //  Toast.makeText(LoginActivity.this,url,Toast.LENGTH_SHORT).show();
 

@@ -76,7 +76,7 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
 
         submit.setOnClickListener(this);
         gst.addTextChangedListener(this);
-        pan.setEnabled(false);
+      //  pan.setEnabled(false);
 
         LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
         customView = inflater.inflate(R.layout.activity_dialog, null);
@@ -104,6 +104,8 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
             pan.setText(intent.getStringExtra("pan"));
             lat=intent.getStringExtra("lat");
             lng=intent.getStringExtra("lng");
+
+
         }
         else
 
@@ -131,7 +133,9 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
                     lat = String.valueOf(place.getLatLng().latitude);
                     lng = String.valueOf(place.getLatLng().longitude);
 
+                    address.setEnabled(true);
                     address.setText(place.getName());
+                    address.setEnabled(false);
 
 
             }
@@ -165,6 +169,7 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
                 Matcher matcher1=null,matcher2=null;
 
                 if(!gst.getText().equals("")) {
+                    Log.e("First", "if");
                     String s1 = pan.getText().toString();// get your editext value here
                     //  Toast.makeText(this, s1, Toast.LENGTH_LONG).show();
                     Pattern pattern1 = Pattern.compile("[A-Z]{5}[0-9]{4}[A-Z]{1}");
@@ -203,22 +208,37 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
                 }
 
                 else if(contact.getText().length()<10)
+
+                {
+                    Log.e("first", "else if");
                     Toast.makeText(this, "Invalid contact no.", Toast.LENGTH_LONG).show();
+                }
 
 
-                else if(!gst.getText().toString().equals("")) {
+               /* else if(!gst.getText().toString().equals("")) {
+                    Log.e("second ", "else if");
                    if (!matcher1.matches() || !matcher2.matches()) {
 
                         Toast.makeText(this, "Invalid pan or GST", Toast.LENGTH_LONG).show();
                     }
-                }
+                }*/
 
 
                 /*
                 *  sending data to server
                 * */
-                else
+                else {
+                    Log.e("All okay","calling postAllData");
+                      if(!gst.getText().toString().equals("")) {
+                        Log.e("second ", "else if");
+                        if (!matcher1.matches() || !matcher2.matches())
+                            Toast.makeText(this, "Invalid pan or GST", Toast.LENGTH_LONG).show();
+                        else
+                            postAllData();
+                    }
+                  else
                     postAllData();
+                }
                 break;
 
             case R.id.btn_dialog:
@@ -248,7 +268,7 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
             e.printStackTrace();
         }
 
-            final String url = "http://www.thinkbank.co.in/Rajeshahi_app/postCustData.php";
+            final String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/postCustData.php";
 
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     url,
@@ -329,7 +349,7 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
     public void generateId() {
         //  progressDialog.setMessage("Loading..");
         //  progressDialog.show();
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/fetchCustId.php";
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/fetchCustId.php";
         // Log.e("URL",url);
 
         StringRequest strReq = new StringRequest(Request.Method.GET,
@@ -442,7 +462,8 @@ public class AddCustomerActivity extends AppCompatActivity implements View.OnCli
 
                 pan.setEnabled(true);
                 pan.setText(gst.getText().toString().substring(2,12));
-                pan.setEnabled(false);
+                if(editFlag==false)
+                   pan.setEnabled(false);
             }
         }
     }

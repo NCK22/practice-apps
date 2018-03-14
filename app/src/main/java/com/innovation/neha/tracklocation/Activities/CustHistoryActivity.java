@@ -128,7 +128,7 @@ public class CustHistoryActivity extends AppCompatActivity implements View.OnCli
             cust_hist_list.clear();
 
         Log.e("populateWtSpinner","called");
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/getCustHistory.php?u_id="+u_id;
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/getCustHistory.php?u_id="+u_id;
         Log.e("URL",url);
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest

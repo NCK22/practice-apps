@@ -8,14 +8,15 @@ public class SubOrder {
 
     String prod;
     int wt,qty;
-    Double price;
+    Double price,rest;
 
-    public SubOrder(String p,int w,int q,Double pr)
+    public SubOrder(String p,int w,int q,Double pr,Double rest)
     {
         this.prod=p;
         this.wt=w;
         this.qty=q;
         this.price=pr;
+        this.rest=rest;
     }
 
     public String getProd()
@@ -28,4 +29,6 @@ public class SubOrder {
     public Double getPrice(){ return price; }
 
     public int getQty(){ return qty;}
+
+    public Double getRest(){return rest;}
 }

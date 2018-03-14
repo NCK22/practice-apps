@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,10 +29,13 @@ import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.vision.text.Line;
 import com.innovation.neha.tracklocation.Adapters.RecyclerViewAdapter;
 import com.innovation.neha.tracklocation.Adapters.RecyclerViewDetailAdapter;
+import com.innovation.neha.tracklocation.Adapters.RecyclerViewPaymentAdapter;
 import com.innovation.neha.tracklocation.AppController;
 import com.innovation.neha.tracklocation.Pojos.Order;
+import com.innovation.neha.tracklocation.Pojos.Payment;
 import com.innovation.neha.tracklocation.Pojos.SubOrder;
 import com.innovation.neha.tracklocation.R;
 import com.innovation.neha.tracklocation.Storage.SPrefUserInfo;
@@ -49,11 +53,14 @@ import java.util.Map;
 public class HistoryActivity extends AppCompatActivity implements View.OnClickListener {
 
     LinearLayoutManager linearLayoutManager;
+    LinearLayout title_pay;
     RecyclerView recyclerView,recyclerViewDetail;
     RecyclerViewAdapter adapter;
     RecyclerViewDetailAdapter adapterDetail;
+    RecyclerViewPaymentAdapter adapterPayment;
     List<Order> ord_hist_list=new ArrayList<Order>();
     List<SubOrder> subord_hist_list=new ArrayList<SubOrder>();
+    List<Payment>pay_hist_list=new ArrayList<Payment>();
     String tag_string_req = "jsonobj_req",ordforintent,custforintent,totforintent;
     public static Dialog dialog;
     public static boolean flag=false;
@@ -66,7 +73,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
     Button yes,no;
     public static String dh_ord,dh_cust,dh_tot,u_id;
     private SPrefUserInfo sPrefUserInfo;
-
+    private Double rest=0.0;
 
     public static int mainAdapterPosition=0;
 
@@ -86,6 +93,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
         dialog.setCancelable(true);
         dialog.show();
 
+        title_pay=(LinearLayout)dialog.findViewById(R.id.ll_title_pay);
 
 
         progressDialog =new ProgressDialog(this);
@@ -95,7 +103,6 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
         recyclerViewDetail.setHasFixedSize(true);
         recyclerViewDetail.setLayoutManager(new LinearLayoutManager(this));
       //  recyclerViewDetail.addItemDecoration(new SimpleDividerItemDecoration(context, R.drawable.divider));
-
 
 
         recyclerView = (RecyclerView) findViewById(R.id.rv_history);
@@ -183,8 +190,16 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
 
                     populateSubHistory(position);
 
+
+                }
+                else if(view.getId()==R.id.btn_h_pay)
+                {
+                    Log.e("onItemClick", "pay Details");
+                    populatePayHistory(position);
                 }
                 Log.e("onItemClickposition", String.valueOf(position));
+
+
             }
 
             @Override
@@ -205,7 +220,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
     {
         adapterDetail = new RecyclerViewDetailAdapter(getApplicationContext(), subord_hist_list);
         recyclerViewDetail.setAdapter(adapterDetail);
-
+        title_pay.setVisibility(View.GONE);
         adapterDetail.setClickListener(new RecyclerViewDetailAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -214,6 +229,42 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
                     Log.e("onItemClickSub", "Edit");
                     editSubHistory(position);
                 }
+               /* else if(view.getId()==R.id.btn_eh_del)
+                {
+                    Log.e("onItemClickSub", "Delete");
+                    deleteSubHistory(position);
+
+                }*/
+            }
+
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+
+        if(progressDialog.isShowing())
+            progressDialog.dismiss();
+    }
+
+    /*
+    * function to setup pay adapter
+    * */
+    public void setupPayAdapter(){
+
+        adapterPayment = new RecyclerViewPaymentAdapter(getApplicationContext(), pay_hist_list);
+        recyclerViewDetail.setAdapter(adapterPayment);
+
+        title_pay.setVisibility(View.VISIBLE);
+        adapterPayment.setClickListener(new RecyclerViewPaymentAdapter.ItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+               /* if(view.getId()==R.id.btn_eh_edit)
+                {
+                    Log.e("onItemClickSub", "Edit");
+                    editSubHistory(position);
+                }*/
                /* else if(view.getId()==R.id.btn_eh_del)
                 {
                     Log.e("onItemClickSub", "Delete");
@@ -254,7 +305,8 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
             e.printStackTrace();
         }
 
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/editSubOrder.php?ord="+ord;
+       String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/editSubOrder.php?ord="+ord;
+       // String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/populatepayHistory.php?ord="+ord;
         Log.e("URL",url);
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -272,9 +324,9 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
                                 Log.e("Responselength",String.valueOf(response.names().length()));
                                 Log.e("Response",String.valueOf(response));
                                 JSONArray a= (JSONArray) response.get(response.names().getString(i));
-                                SubOrder objOrder=new SubOrder(a.getString(0),a.getInt(1),a.getInt(2),a.getDouble(3));
+                                SubOrder objOrder=new SubOrder(a.getString(0),a.getInt(1),a.getInt(2),a.getDouble(3),a.getDouble(4));
                                 Log.e("ResponseObject",String.valueOf(objOrder));
-
+                                rest = a.getDouble(4);
                                 subord_hist_list.add(objOrder);
                                 Log.e("ResponseSize", String.valueOf(subord_hist_list.size()));
                                 Log.e("onItemlist",subord_hist_list.get(i).getProd());
@@ -303,11 +355,12 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
         dialog.show();
 
     }
+
     public void editHistory(int position)
     {
 
         //dialog.show();
-        Log.e("onItemClick",String.valueOf(ord_hist_list.get(position).getClntName()));
+//        Log.e("onItemClick",String.valueOf(ord_hist_list.get(position).getClntName()));
 
          ordforintent=ord_hist_list.get(position).getOrdNo();
         custforintent=ord_hist_list.get(position).getClntName();
@@ -323,7 +376,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
             e.printStackTrace();
         }
 
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/editOrder.php?ord="+ordforintent+"&&cust="+custforintent+"&&tot="+tot;
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/editOrder.php?ord="+ordforintent+"&&cust="+custforintent+"&&tot="+tot;
         Log.e("URL",url);
 
         JsonArrayRequest jsonRequest = new JsonArrayRequest
@@ -340,6 +393,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
 
                           //  for(int i = 0; i<response.length(); i++){
 
+                            //Log.e("Response rcvd",String.valueOf(response.get(4)));
                                 intent.putExtra("ord",String.valueOf(response.get(0)));
                                 intent.putExtra("cust",String.valueOf(response.get(1)));
                                 intent.putExtra("tot",String.valueOf(response.get(2)));
@@ -348,12 +402,14 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
                                 intent.putExtra("rest",String.valueOf(response.get(5)));
                                 intent.putExtra("cheque",String.valueOf(response.get(6)));
                                 intent.putExtra("dd",String.valueOf(response.get(7)));
+                            intent.putExtra("crdt",String.valueOf(response.get(8)));
                                 intent.putExtra("flag","main");
-                                intent.putExtra("count",String.valueOf(response.get(8)));
+                                intent.putExtra("count",String.valueOf(response.get(9)));
 
 
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     startActivity(intent);
-
+                                    finish();
 
 
                                 Log.e("ResponseObject",String.valueOf(response.get(0)));
@@ -415,9 +471,12 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
         intent.putExtra("w",w);
         intent.putExtra("q",q);
         intent.putExtra("pr",pr);
+        intent.putExtra("rest",String.valueOf(rest));
         intent.putExtra("flag","sub");
 
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+        finish();
 
 
     }
@@ -425,7 +484,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
     {
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
-        String url="http://www.thinkbank.co.in/Rajeshahi_app/delSubOrder.php";
+        String url="http://www.thinkbank.co.in/Rajeshahi_app_testing/delSubOrder.php";
         final String ord=ord_hist_list.get(mainAdapterPosition).getOrdNo();
         final String prod=subord_hist_list.get(position).getProd();
         final int wt=subord_hist_list.get(position).getWt();
@@ -494,8 +553,8 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
 
             ord_hist_list.remove(position);
 
-            // String url = "http://www.thinkbank.co.in/Rajeshahi_app/delOrder.php?ord="+dh_ord+"&&cust="+dh_cust+"&&tot="+dh_tot;
-            String url = "http://www.thinkbank.co.in/Rajeshahi_app/delOrder.php";
+            // String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/delOrder.php?ord="+dh_ord+"&&cust="+dh_cust+"&&tot="+dh_tot;
+            String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/delOrder.php";
             Log.e("URL", url);
 
             StringRequest strReq = new StringRequest(Request.Method.POST,
@@ -584,7 +643,7 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
             ord_hist_list.clear();
 
         Log.e("populateWtSpinner","called");
-        String url = "http://www.thinkbank.co.in/Rajeshahi_app/GetOrderHistory.php?u_id="+u_id;
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/GetOrderHistory.php?u_id="+u_id;
         Log.e("URL",url);
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest
@@ -663,6 +722,78 @@ public class HistoryActivity extends AppCompatActivity implements View.OnClickLi
 
 
     }
+
+    /*
+    *  function to fetch and populate payment history
+    * */
+
+    public void populatePayHistory(int position) {
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+
+        if (pay_hist_list != null)
+            pay_hist_list.clear();
+
+        Log.e("onItemClick", String.valueOf(ord_hist_list.get(position).getClntName()));
+        String ord = ord_hist_list.get(position).getOrdNo();
+        Log.e("onItemClickord", ord);
+
+        try {
+            ord = URLEncoder.encode(String.valueOf(ord), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        String url = "http://www.thinkbank.co.in/Rajeshahi_app_testing/populatePayHistory.php?ord=" + ord;
+
+        Log.e("URL", url);
+
+        JsonObjectRequest jsonRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.e("Response", String.valueOf(response));
+
+                        try {
+
+                            for (int i = 0; i < response.names().length(); i++) {
+
+                                Log.e("Responselength", String.valueOf(response.names().length()));
+                                Log.e("Response", String.valueOf(response));
+                                JSONArray a = (JSONArray) response.get(response.names().getString(i));
+                                Payment objPayment = new Payment(a.getString(0), a.getDouble(1), a.getDouble(2), a.getString(3));
+                                Log.e("ResponseObject", String.valueOf(objPayment));
+
+                                pay_hist_list.add(objPayment);
+                                Log.e("ResponseSize", String.valueOf(pay_hist_list.size()));
+                                //Log.e("onItemlist", pay_hist_list.get(i).getProd());
+
+                                setupPayAdapter();
+
+
+                            }
+
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e("ResponseCatch", String.valueOf(e));
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                        Log.e("ResponseError", String.valueOf(error));
+                    }
+                });
+
+        AppController.getInstance().addToRequestQueue(jsonRequest, tag_string_req);
+        dialog.show();
+    }
+
 
 
     @Override
